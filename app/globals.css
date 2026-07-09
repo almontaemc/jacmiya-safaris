@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme {
+  --color-forest: #2C4A1E;
+  --color-forest-dark: #1A2E12;
+  --color-forest-light: #3D6B35;
+  --color-savanna: #C8963E;
+  --color-savanna-dark: #A87B2E;
+  --color-earth: #8B5E3C;
+  --color-cream: #F7F0E6;
+  --color-bark: #1A1008;
+  --color-moss: #4A7C59;
+  --color-sand: #E8D5B0;
+}
+
+@theme inline {
+  --font-sans: var(--font-lato);
+  --font-serif: var(--font-playfair);
+}
+
+body {
+  background-color: #F7F0E6;
+  color: #1A1008;
+}
