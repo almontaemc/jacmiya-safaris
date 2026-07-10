@@ -25,7 +25,7 @@ const reasons = [
 export default function Home() {
   return (
     <>
-      <section className="relative min-h-[92vh] flex items-end pb-20 bg-bark overflow-hidden" style={{ backgroundImage: "url('/images/tanzania.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
+      <section className="relative min-h-[92vh] flex items-end pb-20 bg-bark overflow-hidden" style={{ backgroundImage: "url('/images/hero-home.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
         <div className="absolute inset-0 bg-gradient-to-t from-bark/90 via-bark/40 to-bark/10" />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="inline-flex items-center gap-2 bg-savanna/20 backdrop-blur-sm border border-savanna/40 rounded-full px-4 py-1.5 text-savanna text-sm mb-6">
