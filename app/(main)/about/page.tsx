@@ -154,7 +154,7 @@ export default function About() {
                 Jacmiya Safaris is a verified operator on <strong>SafariBookings</strong> — the world&apos;s largest online marketplace for African safari tours. Our partnership means independent expert reviews, transparent pricing, and added trust for every traveler.
               </p>
               <a
-                href="https://www.safaribookings.com/"
+                href="https://www.safaribookings.com/p7940"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-[#ff6600] hover:bg-[#e55a00] text-white font-semibold px-6 py-3 rounded-full text-sm transition-colors shadow-md"
