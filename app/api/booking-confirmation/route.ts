@@ -4,10 +4,11 @@ import { NextResponse } from "next/server";
 const NOTIFY_TO = "info@jacmiyasafaris.com";
 
 function createTransport() {
+  const port = Number(process.env.SMTP_PORT ?? 587);
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST ?? "mail.jacmiyasafaris.com",
-    port: Number(process.env.SMTP_PORT ?? 465),
-    secure: true,
+    port,
+    secure: port === 465,
     auth: {
       user: process.env.SMTP_USER ?? NOTIFY_TO,
       pass: process.env.SMTP_PASS,
