@@ -1,4 +1,4 @@
-import { Phone, Mail, MapPin, Clock } from "lucide-react";
+﻿import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import ContactForm from "@/components/ContactForm";
 import type { Metadata } from "next";
 
@@ -13,7 +13,7 @@ export default function Contact() {
     <>
       <section
         className="relative py-28 px-4 text-center bg-bark overflow-hidden"
-        style={{ backgroundImage: "url('https://jacmiyasafaris.com/wp-content/uploads/2026/01/kenya-600x427.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}
+        style={{ backgroundImage: "url('/images/kenya.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}
       >
         <div className="absolute inset-0 bg-bark/80" />
         <div className="relative z-10 max-w-3xl mx-auto">

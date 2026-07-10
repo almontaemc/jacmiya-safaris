@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import ToursClient from "@/components/ToursClient";
 
 export const metadata: Metadata = {
@@ -12,7 +12,7 @@ export default function Tours() {
     <>
       <section
         className="relative py-28 px-4 text-center bg-bark overflow-hidden"
-        style={{ backgroundImage: "url('https://jacmiyasafaris.com/wp-content/uploads/2017/01/Safari-in-Serengeti-National-Park-Tanzania-700x482.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}
+        style={{ backgroundImage: "url('/images/serengeti.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}
       >
         <div className="absolute inset-0 bg-bark/80" />
         <div className="relative z-10 max-w-3xl mx-auto">

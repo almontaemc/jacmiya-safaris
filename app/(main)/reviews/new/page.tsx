@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -95,7 +95,7 @@ export default function SubmitReviewPage() {
     <>
       <section
         className="relative py-24 px-4 text-center bg-bark"
-        style={{ backgroundImage: "url('https://jacmiyasafaris.com/wp-content/uploads/2026/01/Tanzania.jpg')", backgroundSize: "cover", backgroundPosition: "center 40%" }}
+        style={{ backgroundImage: "url('/images/tanzania.jpg')", backgroundSize: "cover", backgroundPosition: "center 40%" }}
       >
         <div className="absolute inset-0 bg-bark/80" />
         <div className="relative z-10 max-w-2xl mx-auto">

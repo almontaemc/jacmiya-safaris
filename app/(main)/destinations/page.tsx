@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -11,8 +11,8 @@ const destinations = [
   {
     country: "Kenya",
     tagline: "The Home of the Safari",
-    image: "https://jacmiyasafaris.com/wp-content/uploads/2026/01/kenya-600x427.jpg",
-    heroImage: "https://jacmiyasafaris.com/wp-content/uploads/2017/01/pexels-virginio-sanches-62820-226368-700x500.jpg",
+    image: "/images/kenya.jpg",
+    heroImage: "/images/wildlife-1.jpg",
     description: "Kenya is where the safari was born. From the iconic Masai Mara — where the Great Migration thunders across the Mara River — to the snow-capped peaks of Mount Kenya and the white sands of Diani Beach, this is a country of jaw-dropping contrasts.",
     highlights: [
       { name: "Masai Mara", detail: "Witness the Great Wildebeest Migration (July–Oct)" },
@@ -28,8 +28,8 @@ const destinations = [
   {
     country: "Tanzania",
     tagline: "The Land of Endless Plains",
-    image: "https://jacmiyasafaris.com/wp-content/uploads/2026/01/Tanzania-600x427.jpg",
-    heroImage: "https://jacmiyasafaris.com/wp-content/uploads/2026/01/Tanzania.jpg",
+    image: "/images/tanzania-sm.jpg",
+    heroImage: "/images/tanzania.jpg",
     description: "Tanzania is home to the Serengeti — arguably the world's greatest wildlife spectacle. Add the Ngorongoro Crater (the world's largest inactive caldera), Tarangire's baobab forests, and the paradise island of Zanzibar, and you have a destination that rivals anywhere on earth.",
     highlights: [
       { name: "Serengeti NP", detail: "Year-round Big Five sightings and the Great Migration" },
@@ -45,8 +45,8 @@ const destinations = [
   {
     country: "Rwanda",
     tagline: "The Land of a Thousand Hills",
-    image: "https://jacmiyasafaris.com/wp-content/uploads/2026/01/pexels-julien-lambert-1869157-35654678-600x427.jpg",
-    heroImage: "https://jacmiyasafaris.com/wp-content/uploads/2026/01/pexels-julien-lambert-1869157-35654678-600x427.jpg",
+    image: "/images/rwanda.jpg",
+    heroImage: "/images/rwanda.jpg",
     description: "Rwanda is Africa's most extraordinary comeback story — a country that has transformed itself into one of the continent's cleanest, safest, and most remarkable destinations. The star attraction? Trekking through mist-shrouded volcanic forests to encounter mountain gorillas face to face.",
     highlights: [
       { name: "Volcanoes NP", detail: "The world's premier mountain gorilla trekking destination" },
@@ -66,7 +66,7 @@ export default function Destinations() {
     <>
       <section
         className="relative py-28 px-4 text-center bg-bark overflow-hidden"
-        style={{ backgroundImage: "url('https://jacmiyasafaris.com/wp-content/uploads/2026/01/Tanzania.jpg')", backgroundSize: "cover", backgroundPosition: "center 40%" }}
+        style={{ backgroundImage: "url('/images/tanzania.jpg')", backgroundSize: "cover", backgroundPosition: "center 40%" }}
       >
         <div className="absolute inset-0 bg-bark/75" />
         <div className="relative z-10 max-w-3xl mx-auto">

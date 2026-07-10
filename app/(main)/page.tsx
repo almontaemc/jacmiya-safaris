@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import FeaturedTours from "@/components/FeaturedTours";
 import TestimonialsSection from "@/components/TestimonialsSection";
 
@@ -10,9 +10,9 @@ const stats = [
 ];
 
 const destinations = [
-  { name: "Tanzania", country: "East Africa", tagline: "Serengeti, Ngorongoro & Zanzibar", image: "https://jacmiyasafaris.com/wp-content/uploads/2026/01/Tanzania-600x427.jpg" },
-  { name: "Kenya", country: "East Africa", tagline: "Masai Mara, Amboseli & Diani Beach", image: "https://jacmiyasafaris.com/wp-content/uploads/2026/01/kenya-600x427.jpg" },
-  { name: "Rwanda", country: "Central Africa", tagline: "Gorilla Trekking & Volcanoes NP", image: "https://jacmiyasafaris.com/wp-content/uploads/2026/01/pexels-julien-lambert-1869157-35654678-600x427.jpg" },
+  { name: "Tanzania", country: "East Africa", tagline: "Serengeti, Ngorongoro & Zanzibar", image: "/images/tanzania-sm.jpg" },
+  { name: "Kenya", country: "East Africa", tagline: "Masai Mara, Amboseli & Diani Beach", image: "/images/kenya.jpg" },
+  { name: "Rwanda", country: "Central Africa", tagline: "Gorilla Trekking & Volcanoes NP", image: "/images/rwanda.jpg" },
 ];
 
 const reasons = [
@@ -25,7 +25,7 @@ const reasons = [
 export default function Home() {
   return (
     <>
-      <section className="relative min-h-[92vh] flex items-end pb-20 bg-bark overflow-hidden" style={{ backgroundImage: "url('https://jacmiyasafaris.com/wp-content/uploads/2026/01/Tanzania.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
+      <section className="relative min-h-[92vh] flex items-end pb-20 bg-bark overflow-hidden" style={{ backgroundImage: "url('/images/tanzania.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
         <div className="absolute inset-0 bg-gradient-to-t from-bark/90 via-bark/40 to-bark/10" />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="inline-flex items-center gap-2 bg-savanna/20 backdrop-blur-sm border border-savanna/40 rounded-full px-4 py-1.5 text-savanna text-sm mb-6">
@@ -100,7 +100,7 @@ export default function Home() {
 
       <TestimonialsSection />
 
-      <section className="relative py-28 px-4 overflow-hidden" style={{ backgroundImage: "url('https://jacmiyasafaris.com/wp-content/uploads/2017/01/Safari-in-Serengeti-National-Park-Tanzania-700x482.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
+      <section className="relative py-28 px-4 overflow-hidden" style={{ backgroundImage: "url('/images/serengeti.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
         <div className="absolute inset-0 bg-bark/75" />
         <div className="relative z-10 max-w-2xl mx-auto text-center">
           <span className="inline-block text-savanna text-sm font-semibold uppercase tracking-widest mb-4">Your Adventure Awaits</span>

@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import type { Metadata } from "next";
 import { Handshake, Leaf, Star, Heart, MapPin, Users, Award, Globe } from "lucide-react";
 
@@ -35,7 +35,7 @@ export default function About() {
     <>
       <section
         className="relative py-32 px-4 text-center bg-bark overflow-hidden"
-        style={{ backgroundImage: "url('https://jacmiyasafaris.com/wp-content/uploads/2026/01/Tanzania.jpg')", backgroundSize: "cover", backgroundPosition: "center 30%" }}
+        style={{ backgroundImage: "url('/images/tanzania.jpg')", backgroundSize: "cover", backgroundPosition: "center 30%" }}
       >
         <div className="absolute inset-0 bg-bark/75" />
         <div className="relative z-10 max-w-3xl mx-auto">
@@ -62,7 +62,7 @@ export default function About() {
           </div>
           <div className="relative">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://jacmiyasafaris.com/wp-content/uploads/2026/01/Tanzania-600x427.jpg" alt="Safari landscape" className="rounded-2xl w-full h-96 object-cover shadow-xl" />
+            <img src="/images/tanzania-sm.jpg" alt="Safari landscape" className="rounded-2xl w-full h-96 object-cover shadow-xl" />
             <div className="absolute -bottom-6 -left-6 bg-forest rounded-2xl p-5 shadow-xl hidden sm:block">
               <div className="text-savanna text-3xl font-bold">10+</div>
               <div className="text-cream text-sm mt-0.5">Years in Business</div>
