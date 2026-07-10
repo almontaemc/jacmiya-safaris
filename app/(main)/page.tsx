@@ -1,7 +1,7 @@
 ﻿import Link from "next/link";
 import FeaturedTours from "@/components/FeaturedTours";
 import TestimonialsSection from "@/components/TestimonialsSection";
-import HeroSlider from "@/components/HeroSlider";
+import VideoHero from "@/components/VideoHero";
 
 const stats = [
   { value: "70+", label: "Destinations" },
@@ -26,7 +26,7 @@ const reasons = [
 export default function Home() {
   return (
     <>
-      <HeroSlider />
+      <VideoHero />
 
       <section className="bg-forest py-8 px-4">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
