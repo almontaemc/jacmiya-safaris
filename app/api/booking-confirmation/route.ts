@@ -1,14 +1,25 @@
-import { Resend } from "resend";
 import { NextResponse } from "next/server";
 
 const NOTIFY_TO = "info@jacmiyasafaris.com";
 const FROM = "Jacmiya Safaris <info@jacmiyasafaris.com>";
 
+async function sendEmail(payload: { to: string; replyTo: string; subject: string; html: string }) {
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { "Authorization": `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ from: FROM, ...payload }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { message?: string }).message ?? `Resend ${res.status}`);
+  }
+  return res.json();
+}
+
 export async function POST(req: Request) {
   if (!process.env.RESEND_API_KEY) {
     return NextResponse.json({ ok: false, error: "Email service not configured" }, { status: 503 });
   }
-  const resend = new Resend(process.env.RESEND_API_KEY);
 
   const body = await req.json() as {
     clientName: string;
@@ -140,20 +151,8 @@ export async function POST(req: Request) {
 
   try {
     const [clientResult, staffResult] = await Promise.allSettled([
-      resend.emails.send({
-        from: FROM,
-        to: clientEmail,
-        replyTo: replyEmail,
-        subject: `Booking Confirmed — ${bookingRef} | ${tourTitle} | ${companyName}`,
-        html,
-      }),
-      resend.emails.send({
-        from: FROM,
-        to: NOTIFY_TO,
-        replyTo: clientEmail,
-        subject: `Booking confirmation sent to ${clientName} — ${bookingRef}`,
-        html: `<p>Booking confirmation email was sent to <strong>${clientEmail}</strong> for booking <strong>${bookingRef}</strong> (${tourTitle}).</p>`,
-      }),
+      sendEmail({ to: clientEmail, replyTo: replyEmail, subject: `Booking Confirmed — ${bookingRef} | ${tourTitle} | ${companyName}`, html }),
+      sendEmail({ to: NOTIFY_TO, replyTo: clientEmail, subject: `Booking confirmation sent to ${clientName} — ${bookingRef}`, html: `<p>Booking confirmation email was sent to <strong>${clientEmail}</strong> for booking <strong>${bookingRef}</strong> (${tourTitle}).</p>` }),
     ]);
 
     return NextResponse.json({

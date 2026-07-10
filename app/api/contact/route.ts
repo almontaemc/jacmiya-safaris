@@ -1,15 +1,33 @@
-import { Resend } from "resend";
 import { NextResponse } from "next/server";
 
 const NOTIFY_TO = "info@jacmiyasafaris.com";
 const FROM = "Jacmiya Safaris <info@jacmiyasafaris.com>";
 
+async function sendEmail(payload: {
+  to: string;
+  replyTo: string;
+  subject: string;
+  html: string;
+}) {
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ from: FROM, ...payload }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { message?: string }).message ?? `Resend ${res.status}`);
+  }
+  return res.json();
+}
+
 export async function POST(req: Request) {
   if (!process.env.RESEND_API_KEY) {
     return NextResponse.json({ ok: false, error: "Email service not configured" }, { status: 503 });
   }
-
-  const resend = new Resend(process.env.RESEND_API_KEY);
 
   const body = await req.json() as {
     name: string;
@@ -70,7 +88,7 @@ export async function POST(req: Request) {
       <div style="background:#fff;padding:32px 28px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none;">
         <h2 style="color:#1f2937;margin:0 0 12px;font-size:20px;">Thank you, ${name}!</h2>
         <p style="color:#4b5563;font-size:15px;line-height:1.7;margin:0 0 16px;">
-          We've received your safari enquiry and our team is already working on a personalised proposal for you.
+          We have received your safari enquiry and our team is already working on a personalised proposal for you.
           You can expect to hear from us within <strong>24 hours</strong>.
         </p>
         <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:20px;margin:20px 0;">
@@ -90,33 +108,15 @@ export async function POST(req: Request) {
     </div>
   `;
 
-  try {
-    const [staffResult, clientResult] = await Promise.allSettled([
-      resend.emails.send({
-        from: FROM,
-        to: NOTIFY_TO,
-        replyTo: email,
-        subject: `New Safari Enquiry — ${name} (${destination || tourInterest || "Custom"})`,
-        html: staffHtml,
-      }),
-      resend.emails.send({
-        from: FROM,
-        to: email,
-        replyTo: NOTIFY_TO,
-        subject: `Your Jacmiya Safaris Enquiry — We'll be in touch within 24 hours`,
-        html: clientHtml,
-      }),
-    ]);
+  const [staffResult, clientResult] = await Promise.allSettled([
+    sendEmail({ to: NOTIFY_TO, replyTo: email, subject: `New Safari Enquiry — ${name} (${destination || tourInterest || "Custom"})`, html: staffHtml }),
+    sendEmail({ to: email, replyTo: NOTIFY_TO, subject: `Your Jacmiya Safaris Enquiry — We'll be in touch within 24 hours`, html: clientHtml }),
+  ]);
 
-    return NextResponse.json({
-      ok: staffResult.status === "fulfilled",
-      autoReplyOk: clientResult.status === "fulfilled",
-      staffError: staffResult.status === "rejected" ? (staffResult.reason as Error)?.message : null,
-      clientError: clientResult.status === "rejected" ? (clientResult.reason as Error)?.message : null,
-    });
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.error("[contact/route] email error:", msg);
-    return NextResponse.json({ ok: false, error: msg }, { status: 500 });
-  }
+  return NextResponse.json({
+    ok: staffResult.status === "fulfilled",
+    autoReplyOk: clientResult.status === "fulfilled",
+    staffError: staffResult.status === "rejected" ? (staffResult.reason as Error)?.message : null,
+    clientError: clientResult.status === "rejected" ? (clientResult.reason as Error)?.message : null,
+  });
 }
