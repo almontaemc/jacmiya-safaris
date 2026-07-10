@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { getSales, getExpenses, getLeads, getTours } from "@/lib/adminStore";
 import type { Sale, Expense, Lead, AdminTour } from "@/types/admin";
-import { TrendingUp, TrendingDown, DollarSign, Target, BarChart2 } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Target, BarChart2, FileBarChart2, Receipt, Users, ArrowRight } from "lucide-react";
 
 function fmtK(n: number) {
   if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
@@ -107,11 +108,34 @@ export default function ReportsPage() {
 
   const CAT_COLORS = ["bg-emerald-500", "bg-blue-500", "bg-amber-500", "bg-orange-500", "bg-purple-500", "bg-red-400", "bg-teal-500", "bg-gray-400"];
 
+  const SECTION_CARDS = [
+    { label: "Sales Report", href: "/admin/reports/sales", icon: DollarSign, desc: "Bookings, revenue & payments", color: "text-emerald-700 bg-emerald-50 border-emerald-200" },
+    { label: "Expenses Report", href: "/admin/reports/expenses", icon: Receipt, desc: "All expenditure by category", color: "text-red-700 bg-red-50 border-red-200" },
+    { label: "Payroll Report", href: "/admin/reports/payroll", icon: Users, desc: "Staff salaries & payroll runs", color: "text-blue-700 bg-blue-50 border-blue-200" },
+    { label: "Leads Report", href: "/admin/reports/leads", icon: Target, desc: "Pipeline & conversion rates", color: "text-purple-700 bg-purple-50 border-purple-200" },
+    { label: "HR Report", href: "/admin/reports/hr", icon: FileBarChart2, desc: "Staff roster & leave summary", color: "text-amber-700 bg-amber-50 border-amber-200" },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Reports & Analytics</h1>
         <p className="text-gray-500 text-sm mt-0.5">Performance overview across revenue, leads, and operations</p>
+      </div>
+
+      {/* Section report cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        {SECTION_CARDS.map((c) => (
+          <Link key={c.label} href={c.href}
+            className={`group rounded-2xl p-4 border ${c.color} hover:shadow-md transition-all`}>
+            <div className="flex items-center justify-between mb-2">
+              <c.icon className="w-5 h-5 opacity-80" />
+              <ArrowRight className="w-3.5 h-3.5 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+            </div>
+            <div className="font-semibold text-sm">{c.label}</div>
+            <div className="text-xs mt-0.5 opacity-70">{c.desc}</div>
+          </Link>
+        ))}
       </div>
 
       {/* KPI row */}

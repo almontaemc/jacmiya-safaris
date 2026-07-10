@@ -40,7 +40,17 @@ const NAV = [
       { label: "Add Expense", href: "/admin/expenses/new" },
     ],
   },
-  { label: "Reports", href: "/admin/reports", icon: BarChart2 },
+  {
+    label: "Reports", icon: BarChart2,
+    children: [
+      { label: "Overview", href: "/admin/reports" },
+      { label: "Sales Report", href: "/admin/reports/sales" },
+      { label: "Expenses Report", href: "/admin/reports/expenses" },
+      { label: "Payroll Report", href: "/admin/reports/payroll" },
+      { label: "Leads Report", href: "/admin/reports/leads" },
+      { label: "HR Report", href: "/admin/reports/hr" },
+    ],
+  },
   {
     label: "Reviews", icon: Star,
     children: [
@@ -65,7 +75,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [expanded, setExpanded] = useState<string[]>(["Tours", "Leads", "Sales", "Expenses", "Reviews", "Human Resources"]);
+  const [expanded, setExpanded] = useState<string[]>(["Tours", "Leads", "Sales", "Expenses", "Reports", "Reviews", "Human Resources"]);
   const [searchQuery, setSearchQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -85,7 +95,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   }
 
   function isActive(href: string) {
-    if (href === "/admin") return pathname === "/admin";
+    if (href === "/admin" || href === "/admin/reports") return pathname === href;
     return pathname.startsWith(href);
   }
 
