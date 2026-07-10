@@ -1,3 +1,11 @@
+export interface ItineraryDay {
+  day: number;
+  title: string;
+  description: string;
+  meals?: string;
+  accommodation?: string;
+}
+
 export interface AdminTour {
   id: number;
   title: string;
@@ -15,6 +23,8 @@ export interface AdminTour {
   active: boolean;
   createdAt: string;
   updatedAt: string;
+  description?: string;
+  itinerary: ItineraryDay[];
 }
 
 export type Department =

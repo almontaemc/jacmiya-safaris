@@ -1,3 +1,5 @@
+import type { ItineraryDay } from "@/types/admin";
+
 export interface Tour {
   id: number;
   title: string;
@@ -12,6 +14,8 @@ export interface Tour {
   includes: string[];
   badge: string;
   badgeColor: string;
+  description?: string;
+  itinerary: ItineraryDay[];
 }
 
 export const allTours: Tour[] = [
@@ -29,6 +33,15 @@ export const allTours: Tour[] = [
     includes: ["Accommodation", "All meals", "Game drives", "Park fees", "Professional guide"],
     badge: "Best Seller",
     badgeColor: "bg-savanna",
+    description: "Experience the best of Kenya in one unforgettable journey — from lion-filled savanna to powder-white beaches. This 6-day tour combines the magic of Masai Mara with a relaxing finale on Diani Beach.",
+    itinerary: [
+      { day: 1, title: "Arrival & Nairobi National Park", description: "Arrive at JKIA and meet your guide for a welcome briefing. Head straight to Nairobi National Park — the world's only national park inside a capital city — for an afternoon game drive spotting lions, rhinos, and giraffes against the city skyline.", meals: "Dinner", accommodation: "Nairobi Hotel" },
+      { day: 2, title: "Drive to Masai Mara", description: "After breakfast, enjoy a scenic 5-hour drive to the world-famous Masai Mara Game Reserve. Check into your camp and set off on an evening game drive as the golden light bathes the plains — perfect for photography.", meals: "Breakfast, Lunch, Dinner", accommodation: "Masai Mara Safari Camp" },
+      { day: 3, title: "Full Day in Masai Mara", description: "A full day on the Mara with morning and afternoon game drives. Search for lion prides, cheetah families, elephant herds, and — between July and October — the spectacular Great Wildebeest Migration crossing the Mara River.", meals: "Breakfast, Lunch, Dinner", accommodation: "Masai Mara Safari Camp" },
+      { day: 4, title: "Maasai Village & More Game Drives", description: "Visit an authentic Maasai village to learn about the culture, traditional dances, and warrior lifestyle. Return for more game drives; leopards are often spotted in the rocky outcrops during afternoon hours.", meals: "Breakfast, Lunch, Dinner", accommodation: "Masai Mara Safari Camp" },
+      { day: 5, title: "Transfer to Diani Beach", description: "After an early morning game drive, depart for Diani Beach on Kenya's stunning Indian Ocean coast. Check into your beachfront resort and spend the afternoon unwinding on the palm-fringed white sand.", meals: "Breakfast, Dinner", accommodation: "Diani Beach Resort" },
+      { day: 6, title: "Beach Leisure & Departure", description: "Enjoy a final morning swimming, snorkeling, or simply relaxing on one of Africa's most beautiful beaches. After lunch, transfer to Mombasa Airport for your departure flight home.", meals: "Breakfast, Lunch", accommodation: "N/A — Departure Day" },
+    ],
   },
   {
     id: 2,
@@ -44,6 +57,19 @@ export const allTours: Tour[] = [
     includes: ["Luxury lodges", "All meals", "Flights within Tanzania", "Park fees", "Snorkeling"],
     badge: "Best Seller",
     badgeColor: "bg-savanna",
+    description: "The ultimate Tanzania experience — four of the world's greatest wildlife destinations back-to-back, finishing with three blissful nights in paradise Zanzibar. Unmatched in scope and luxury.",
+    itinerary: [
+      { day: 1, title: "Arrival in Arusha", description: "Fly into Kilimanjaro International Airport and transfer to your luxury lodge in Arusha. Meet your guide over dinner for a thorough briefing on the days ahead.", meals: "Dinner", accommodation: "Arusha Coffee Lodge" },
+      { day: 2, title: "Tarangire National Park", description: "Drive to Tarangire National Park, famed for its massive baobab trees and extraordinary elephant herds. Spend a full day game driving through river valleys teeming with buffalo, leopards, and over 500 bird species.", meals: "Breakfast, Lunch, Dinner", accommodation: "Tarangire Treetops Lodge" },
+      { day: 3, title: "Into the Serengeti", description: "Transfer to the central Serengeti via the Ngorongoro Conservation Area, pausing for spectacular crater rim views. Arrive in the Serengeti late afternoon for your first evening game drive on the endless plains.", meals: "Breakfast, Lunch, Dinner", accommodation: "Serengeti Luxury Tented Camp" },
+      { day: 4, title: "Full Day Serengeti Safari", description: "A full day exploring the Serengeti ecosystem with morning and late-afternoon game drives. Search for lion prides, cheetah chases, and massive wildebeest herds. Optional pre-dawn hot air balloon flight available.", meals: "Breakfast, Lunch, Dinner", accommodation: "Serengeti Luxury Tented Camp" },
+      { day: 5, title: "Ngorongoro Crater Descent", description: "Descend into the Ngorongoro Crater — the world's largest intact caldera — home to over 30,000 animals including all of the Big Five and critically endangered black rhinos. Enjoy a picnic lunch on the crater floor.", meals: "Breakfast, Lunch, Dinner", accommodation: "Ngorongoro Crater Lodge" },
+      { day: 6, title: "Flight to Zanzibar", description: "Morning flight from Arusha to Zanzibar Island. Transfer to your beachfront resort and spend the afternoon on pristine white-sand beaches lapped by turquoise Indian Ocean waters.", meals: "Breakfast, Dinner", accommodation: "Zanzibar Luxury Beach Resort" },
+      { day: 7, title: "Stone Town & Spice Farm", description: "Explore UNESCO World Heritage Stone Town on a guided walking tour through narrow alleys, the old slave market, and vibrant Darajani market. Visit a working spice farm to discover cloves, vanilla, and cinnamon growing in the wild.", meals: "Breakfast, Lunch, Dinner", accommodation: "Zanzibar Luxury Beach Resort" },
+      { day: 8, title: "Snorkeling & Ocean Adventures", description: "Full day of Indian Ocean activities — snorkel at Mnemba Atoll (one of Africa's best dive sites), spot dolphins at Kizimkazi, or take a traditional sunset dhow cruise along the coast.", meals: "Breakfast, Dinner", accommodation: "Zanzibar Luxury Beach Resort" },
+      { day: 9, title: "Beach Leisure & Sundowner", description: "A free day in paradise. Swim, relax with a spa treatment, or explore local fishing villages on bicycle. Farewell dinner on the beach under the stars with a Swahili feast.", meals: "Breakfast, Dinner", accommodation: "Zanzibar Luxury Beach Resort" },
+      { day: 10, title: "Departure", description: "Morning at leisure before transfer to Zanzibar Airport for your departure flight. What an extraordinary journey through Tanzania's greatest wildlife havens and beaches.", meals: "Breakfast", accommodation: "N/A — Departure Day" },
+    ],
   },
   {
     id: 3,
@@ -59,6 +85,14 @@ export const allTours: Tour[] = [
     includes: ["Accommodation", "Full board", "Game drives", "Park fees", "Safari guide"],
     badge: "Adventure",
     badgeColor: "bg-earth",
+    description: "Five intense days focused entirely on Tanzania's big cat country. The Serengeti is the world's greatest arena for predator watching — lions, cheetahs, and leopards await at every turn.",
+    itinerary: [
+      { day: 1, title: "Arrival in Arusha", description: "Arrive at Kilimanjaro International Airport and transfer to your Arusha guesthouse. Meet your guide for a briefing and early dinner to prepare for the adventures ahead.", meals: "Dinner", accommodation: "Arusha Lodge" },
+      { day: 2, title: "Serengeti — Big Cat Country", description: "Drive through the Ngorongoro Conservation Area into the heart of the Serengeti. Afternoon game drive focused on finding the resident lion prides and cheetah families that dominate the central plains.", meals: "Breakfast, Lunch, Dinner", accommodation: "Serengeti Tented Camp" },
+      { day: 3, title: "Full Serengeti Day & Night Drive", description: "An epic full day in the Serengeti with a dawn drive to catch lions on morning hunts. Evening bush dinner under acacia trees, followed by an optional night game drive to spot leopards, hyenas, and genets.", meals: "Breakfast, Lunch, Bush Dinner", accommodation: "Serengeti Tented Camp" },
+      { day: 4, title: "Ngorongoro Crater Floor", description: "Early morning descent into the Ngorongoro Crater — the 8th Wonder of the Natural World. Spend the full day on the crater floor spotting elephants, flamingos at Lake Magadi, black rhinos, and massive lion prides.", meals: "Breakfast, Packed Lunch, Dinner", accommodation: "Ngorongoro Lodge" },
+      { day: 5, title: "Return to Arusha & Departure", description: "Final morning game drive in the Ngorongoro Conservation Area before driving back to Arusha. Transfer to Kilimanjaro Airport for your departure flight — memories guaranteed to last a lifetime.", meals: "Breakfast, Lunch", accommodation: "N/A — Departure Day" },
+    ],
   },
   {
     id: 4,
@@ -74,6 +108,13 @@ export const allTours: Tour[] = [
     includes: ["Private camp", "Full board", "Private vehicle", "Park fees", "Expert guide"],
     badge: "Special Offer",
     badgeColor: "bg-forest-light",
+    description: "Four days of pure Masai Mara luxury in your own private vehicle with an expert guide. Perfect for couples, families, and photographers wanting an intimate Big Five experience.",
+    itinerary: [
+      { day: 1, title: "Fly or Drive to Masai Mara", description: "Transfer from Nairobi to the Masai Mara — either by scenic 5-hour road transfer or quick 45-minute charter flight. Check into your private luxury camp and enjoy a sundowner game drive as the sun sets over the savanna.", meals: "Lunch, Dinner", accommodation: "Private Luxury Camp" },
+      { day: 2, title: "Full Day Private Safari", description: "Wake before dawn for a sunrise game drive with your exclusive private guide and vehicle. Spend the full day following wildlife at your own pace — no schedules, no crowds. Optional hot air balloon flight at sunrise (extra cost).", meals: "Breakfast, Packed Lunch, Dinner", accommodation: "Private Luxury Camp" },
+      { day: 3, title: "Night Drive & Maasai Experience", description: "Morning game drive followed by a visit to a traditional Maasai village for cultural immersion. Evening optional night game drive in the Mara — spot nocturnal predators including leopards, aardvarks, and civets.", meals: "Breakfast, Lunch, Dinner", accommodation: "Private Luxury Camp" },
+      { day: 4, title: "Final Safari & Departure", description: "One last early morning game drive before packing up and transferring back to Nairobi. The Mara never disappoints — cheetahs, lions, and elephants are commonly seen right up to departure.", meals: "Breakfast, Lunch", accommodation: "N/A — Departure Day" },
+    ],
   },
   {
     id: 5,
@@ -89,6 +130,14 @@ export const allTours: Tour[] = [
     includes: ["Mid-range lodges", "All meals", "Game drives", "Park fees", "Guide"],
     badge: "15% Off",
     badgeColor: "bg-moss",
+    description: "A focused 5-day circuit of Tanzania's northern safari circuit — Tarangire, Lake Manyara, and Ngorongoro Crater — covering enormous elephant herds, tree-climbing lions, and flamingo-pink lakes.",
+    itinerary: [
+      { day: 1, title: "Arrival & Arusha", description: "Arrive at Kilimanjaro International Airport and transfer to your Arusha lodge. Evening briefing with your guide over dinner to go through the itinerary ahead.", meals: "Dinner", accommodation: "Arusha Mid-Range Lodge" },
+      { day: 2, title: "Tarangire National Park", description: "Drive to Tarangire National Park, home to one of Africa's highest concentrations of elephants. The giant baobab trees provide a stunning backdrop as you watch herds of over 100 elephants gather at the Tarangire River.", meals: "Breakfast, Lunch, Dinner", accommodation: "Tarangire Safari Camp" },
+      { day: 3, title: "Lake Manyara & Tree-Climbing Lions", description: "Visit Lake Manyara National Park — famous for its tree-climbing lions, vast flocks of flamingos on the alkaline lake, and forest elephants. Drive through lush groundwater forest before reaching the lake shore.", meals: "Breakfast, Lunch, Dinner", accommodation: "Lake Manyara Lodge" },
+      { day: 4, title: "Ngorongoro Crater", description: "The highlight of the tour — a full descent into the Ngorongoro Crater. Spend the entire day inside Africa's most densely packed wildlife arena. Black rhinos, lions, buffaloes, hippos, and tens of thousands of wildebeest await.", meals: "Breakfast, Packed Lunch, Dinner", accommodation: "Ngorongoro Lodge" },
+      { day: 5, title: "Return to Arusha & Departure", description: "Morning drive back to Arusha through the scenic highlands. Transfer to Kilimanjaro Airport for your departure flight. Tanzania will leave you speechless.", meals: "Breakfast, Lunch", accommodation: "N/A — Departure Day" },
+    ],
   },
   {
     id: 6,
@@ -104,6 +153,19 @@ export const allTours: Tour[] = [
     includes: ["Accommodation", "Full board", "All game drives", "Park fees", "Domestic flights"],
     badge: "Popular",
     badgeColor: "bg-savanna",
+    description: "The definitive Kenya safari — four iconic reserves in 10 days. Amboseli's Kilimanjaro backdrop, Samburu's rare northern species, Tsavo's red elephants, and finally the legendary Masai Mara.",
+    itinerary: [
+      { day: 1, title: "Arrival in Nairobi", description: "Arrive at JKIA and transfer to your Nairobi hotel. Welcome dinner with your guide and briefing on the 10-day adventure ahead.", meals: "Dinner", accommodation: "Nairobi Hotel" },
+      { day: 2, title: "Amboseli National Park", description: "Drive to Amboseli National Park beneath the iconic backdrop of Mount Kilimanjaro. Afternoon game drive watching massive elephant herds roam the dusty plains with Africa's highest peak as a stunning backdrop.", meals: "Breakfast, Lunch, Dinner", accommodation: "Amboseli Safari Lodge" },
+      { day: 3, title: "Amboseli Full Day", description: "Full day in Amboseli with morning and afternoon game drives. This park has the largest bull elephants in Africa — old 'big tuskers' that make for incredible photography. Lions and cheetahs are also frequently spotted.", meals: "Breakfast, Lunch, Dinner", accommodation: "Amboseli Safari Lodge" },
+      { day: 4, title: "Drive to Tsavo East", description: "Transfer through the dramatic Tsavo landscape — vast red earth and thorny bush. Arrive at Tsavo East National Park, Kenya's largest, and enjoy an afternoon game drive spotting the famous 'red elephants' coloured by Tsavo's volcanic soil.", meals: "Breakfast, Lunch, Dinner", accommodation: "Tsavo East Lodge" },
+      { day: 5, title: "Tsavo East Full Day", description: "A full day exploring the wild Tsavo East — home to massive lion prides, large elephant herds, and the striking Yatta Plateau. Visit Lugard Falls on the Galana River, carved by centuries of rushing water.", meals: "Breakfast, Lunch, Dinner", accommodation: "Tsavo East Lodge" },
+      { day: 6, title: "Fly to Samburu", description: "Morning game drive then fly to Samburu National Reserve in Kenya's remote north. Arrive at your lodge in time for an evening game drive searching for Samburu's special five: Grevy's zebra, Somali ostrich, reticulated giraffe, gerenuk, and beisa oryx.", meals: "Breakfast, Dinner", accommodation: "Samburu Luxury Lodge" },
+      { day: 7, title: "Samburu Full Day", description: "Two game drives in Samburu — morning along the Ewaso Ng'iro River where large crocodiles bask, and afternoon through arid bush unique to northern Kenya. Leopards are commonly spotted here, draped in acacia trees.", meals: "Breakfast, Lunch, Dinner", accommodation: "Samburu Luxury Lodge" },
+      { day: 8, title: "Fly to Masai Mara", description: "Morning game drive then fly to the Masai Mara — the greatest wildlife destination on earth. Check into your camp in time for an evening game drive as the sun turns the plains golden.", meals: "Breakfast, Dinner", accommodation: "Masai Mara Camp" },
+      { day: 9, title: "Full Day Masai Mara", description: "An entire day in the Mara — morning and afternoon game drives searching for the Big Five. Between July and October the Great Migration is in full swing. Hot air balloon option available at sunrise.", meals: "Breakfast, Lunch, Dinner", accommodation: "Masai Mara Camp" },
+      { day: 10, title: "Final Drive & Departure", description: "Last morning game drive before transferring back to Nairobi. Short stay at the hotel before your departure flight — carrying memories of a truly epic Kenyan journey.", meals: "Breakfast, Lunch", accommodation: "N/A — Departure Day" },
+    ],
   },
   {
     id: 7,
@@ -119,6 +181,17 @@ export const allTours: Tour[] = [
     includes: ["Luxury safari lodge", "Beachfront resort", "Full board", "Park fees", "Guide"],
     badge: "Luxury",
     badgeColor: "bg-moss",
+    description: "The perfect Kenya holiday — three nights of world-class safari in the Masai Mara followed by four nights of pure luxury on Diani Beach. Bush meets beach in unforgettable style.",
+    itinerary: [
+      { day: 1, title: "Nairobi Arrival & Transfer", description: "Arrive in Nairobi and transfer directly to your luxury Masai Mara lodge — either by road or short charter flight. Afternoon game drive to ease into the magical Mara environment.", meals: "Dinner", accommodation: "Masai Mara Luxury Lodge" },
+      { day: 2, title: "Full Day Masai Mara", description: "Wake before dawn for a sunrise game drive in the Mara. Spend the full day following wildlife — lions on kills, cheetah hunts, and river crossings (seasonal) make this one of the world's great wildlife spectacles.", meals: "Breakfast, Packed Lunch, Dinner", accommodation: "Masai Mara Luxury Lodge" },
+      { day: 3, title: "Mara Conservancy & Sundowner", description: "Explore a private Mara conservancy where off-road driving is allowed — get closer to wildlife than in the main reserve. Evening sundowner overlooking the savanna followed by a candlelit bush dinner.", meals: "Breakfast, Lunch, Dinner", accommodation: "Masai Mara Luxury Lodge" },
+      { day: 4, title: "Morning Safari & Fly to Diani", description: "Final dawn game drive then fly to Mombasa and transfer to your beachfront resort on Diani Beach. Afternoon arrival — swap your safari gear for a swimsuit.", meals: "Breakfast, Dinner", accommodation: "Diani Luxury Beach Resort" },
+      { day: 5, title: "Diani Beach Leisure", description: "A full free day on Diani Beach — consistently rated one of the world's top beaches. Swim in the warm Indian Ocean, sunbathe on white sand, or explore the coral reef just offshore.", meals: "Breakfast, Dinner", accommodation: "Diani Luxury Beach Resort" },
+      { day: 6, title: "Snorkeling & Marine Excursion", description: "Guided snorkeling excursion to Diani's coral gardens, home to parrotfish, moray eels, sea turtles, and vibrant coral formations. Afternoon sunset dhow cruise along the coast with refreshments.", meals: "Breakfast, Dinner", accommodation: "Diani Luxury Beach Resort" },
+      { day: 7, title: "Optional Activities & Farewell", description: "A final relaxing beach day — optional kitesurfing, deep-sea fishing, or a visit to Shimba Hills National Reserve for elephant sightings just 30 minutes inland. Farewell dinner on the beach.", meals: "Breakfast, Dinner", accommodation: "Diani Luxury Beach Resort" },
+      { day: 8, title: "Departure", description: "Morning at leisure before transfer to Mombasa Airport for your departure flight. The perfect end to a bush and beach adventure.", meals: "Breakfast", accommodation: "N/A — Departure Day" },
+    ],
   },
   {
     id: 8,
@@ -134,6 +207,16 @@ export const allTours: Tour[] = [
     includes: ["Private jeep", "Luxury tented camp", "Full board", "Park fees", "Expert guide"],
     badge: "Private",
     badgeColor: "bg-forest-light",
+    description: "A premium 7-day private safari in your own dedicated jeep — no sharing, no compromises. Your expert guide sets the agenda based purely on what you want to see and do.",
+    itinerary: [
+      { day: 1, title: "Nairobi & Lake Nakuru", description: "Depart Nairobi in your private 4×4 and drive to Lake Nakuru National Park — the home of flamingos and rhinos. Afternoon game drive around the lake, famous for up to a million flamingos and Kenya's largest population of both black and white rhinos.", meals: "Lunch, Dinner", accommodation: "Lake Nakuru Lodge" },
+      { day: 2, title: "Lake Nakuru Full Day", description: "Full day exploring Lake Nakuru — morning walk along the lake shore followed by a game drive through the acacia woodland where lions, leopards, and waterbuck are commonly found. The rhinos here are habituated and allow close approach.", meals: "Breakfast, Lunch, Dinner", accommodation: "Lake Nakuru Lodge" },
+      { day: 3, title: "Drive to Masai Mara", description: "Drive south through the Rift Valley to the Masai Mara. Stop at the dramatic Mara Escarpment for panoramic views before descending into the golden plains. Evening game drive as the Mara reveals its magic.", meals: "Breakfast, Lunch, Dinner", accommodation: "Masai Mara Tented Camp" },
+      { day: 4, title: "Full Day Private Mara Safari", description: "Your exclusive private vehicle gives you complete freedom — follow a cheetah hunt, wait out a lion kill, or track elephants across the Mara Triangle. Your expert guide reads the bush with extraordinary skill.", meals: "Breakfast, Packed Lunch, Dinner", accommodation: "Masai Mara Tented Camp" },
+      { day: 5, title: "Maasai Village & Mara Exploration", description: "Morning game drive then visit an authentic Maasai village — meet the community, learn traditional skills, and understand the Maasai's ancient relationship with the land and wildlife that surrounds them.", meals: "Breakfast, Lunch, Dinner", accommodation: "Masai Mara Tented Camp" },
+      { day: 6, title: "Final Mara Day", description: "Last full day in the Mara — spend it however you wish. Hot air balloon flight is available at sunrise. Bush dinner under the stars rounds off a spectacular Mara experience.", meals: "Breakfast, Lunch, Dinner", accommodation: "Masai Mara Tented Camp" },
+      { day: 7, title: "Return to Nairobi & Departure", description: "Morning game drive then drive back to Nairobi. Stop at a viewpoint over the Rift Valley for a final farewell to Kenya's extraordinary landscapes. Transfer to JKIA for departure.", meals: "Breakfast, Lunch", accommodation: "N/A — Departure Day" },
+    ],
   },
   {
     id: 9,
@@ -149,6 +232,18 @@ export const allTours: Tour[] = [
     includes: ["Premium lodges", "All meals", "Game drives", "Park fees", "Bush walk"],
     badge: "Luxury",
     badgeColor: "bg-moss",
+    description: "Nine days of Kenya's most spectacular landscapes and wildlife — from Kilimanjaro's shadow in Amboseli to the volcanic drama of Tsavo and finally the legendary Masai Mara.",
+    itinerary: [
+      { day: 1, title: "Nairobi Arrival", description: "Welcome to Kenya. Transfer to your Nairobi hotel and enjoy a briefing dinner with your guide. Early night in preparation for the adventure ahead.", meals: "Dinner", accommodation: "Nairobi Premium Hotel" },
+      { day: 2, title: "Amboseli National Park", description: "Drive south to Amboseli beneath the magnificent cone of Mount Kilimanjaro. Afternoon game drive watching huge elephant herds cross the open plains with Africa's highest mountain providing the iconic backdrop.", meals: "Breakfast, Lunch, Dinner", accommodation: "Amboseli Premium Lodge" },
+      { day: 3, title: "Amboseli Full Day & Mount Kenya Views", description: "Full day in Amboseli with two game drives. On clear mornings Mount Kilimanjaro is perfectly visible — a photographer's dream. Spot large herds of elephants, lions, cheetahs, and over 400 bird species.", meals: "Breakfast, Lunch, Dinner", accommodation: "Amboseli Premium Lodge" },
+      { day: 4, title: "Tsavo West — Volcanic Wilderness", description: "Transfer to Tsavo West National Park — a dramatic landscape of lava flows, open plains, and the Mzima Springs oasis. Afternoon game drive and hippo viewing from an underwater observatory.", meals: "Breakfast, Lunch, Dinner", accommodation: "Tsavo West Safari Lodge" },
+      { day: 5, title: "Tsavo East — Red Elephant Country", description: "Cross into Tsavo East, Kenya's largest national park. The 'red elephants' of Tsavo are coated in the park's distinctive red volcanic dust, making them unlike any elephants in Africa. Massive buffalo herds and Yatta Plateau.", meals: "Breakfast, Lunch, Dinner", accommodation: "Tsavo East Safari Lodge" },
+      { day: 6, title: "Tsavo East Full Day", description: "Full day exploring Tsavo East's vast wilderness. Drive along the Galana River, spot crocodiles, and search for the elusive Tsavo lions — larger maned than any others in Africa. Bush walk with an armed ranger.", meals: "Breakfast, Lunch, Dinner", accommodation: "Tsavo East Safari Lodge" },
+      { day: 7, title: "Transfer to Masai Mara", description: "Drive or fly to the Masai Mara — the grand finale of the Kenya circuit. Arrive in time for a late afternoon game drive as the Mara's resident predators begin their evening activity.", meals: "Breakfast, Dinner", accommodation: "Masai Mara Premium Camp" },
+      { day: 8, title: "Full Day Masai Mara", description: "Dawn to dusk in the Mara — two long game drives with a picnic lunch on the plains. Lions, leopards, cheetahs, elephants, and buffaloes are all resident here year-round, with the Migration adding spectacle between July and October.", meals: "Breakfast, Packed Lunch, Dinner", accommodation: "Masai Mara Premium Camp" },
+      { day: 9, title: "Final Safari & Departure", description: "Last sunrise game drive in the Mara — nothing beats watching the sun rise over Africa's greatest wildlife arena. Transfer back to Nairobi for your departure flight, a changed person.", meals: "Breakfast, Lunch", accommodation: "N/A — Departure Day" },
+    ],
   },
   {
     id: 10,
@@ -164,6 +259,17 @@ export const allTours: Tour[] = [
     includes: ["Luxury lodges", "Full board", "Private vehicle", "Park fees", "Expert guide"],
     badge: "Iconic",
     badgeColor: "bg-earth",
+    description: "Eight days covering Kenya's four most iconic wildlife destinations in private luxury. From Nairobi NP to Amboseli, Nakuru, and the Mara — this is Kenya's greatest hits in one seamless journey.",
+    itinerary: [
+      { day: 1, title: "Nairobi & Nairobi National Park", description: "Arrive in Nairobi and head directly to Nairobi National Park for an afternoon game drive. It seems impossible but lions, rhinos, and leopards live within sight of skyscrapers here — one of Africa's great wildlife paradoxes.", meals: "Lunch, Dinner", accommodation: "Nairobi Luxury Hotel" },
+      { day: 2, title: "Drive to Amboseli", description: "Early drive south to Amboseli National Park. The park is world-famous for its large elephant herds — over 1,500 individuals — and the stunning views of Mount Kilimanjaro on clear mornings.", meals: "Breakfast, Lunch, Dinner", accommodation: "Amboseli Luxury Lodge" },
+      { day: 3, title: "Amboseli Full Day", description: "A full day focused on Amboseli's extraordinary elephants and the dramatic Kilimanjaro backdrop. Morning and afternoon game drives, with guided nature walk with Maasai scouts in the afternoon.", meals: "Breakfast, Lunch, Dinner", accommodation: "Amboseli Luxury Lodge" },
+      { day: 4, title: "Drive to Lake Nakuru", description: "Drive north through the Rift Valley to Lake Nakuru. The scenic route passes through Naivasha and the escarpment with sweeping valley views. Afternoon game drive at the lake with its famous flamingo flocks.", meals: "Breakfast, Lunch, Dinner", accommodation: "Lake Nakuru Luxury Lodge" },
+      { day: 5, title: "Lake Nakuru Full Day", description: "Full day in Lake Nakuru National Park — home to Kenya's largest populations of both black and white rhinos, plus lions, leopards, waterbuck, and the lake's extraordinary bird life including pelicans and storks.", meals: "Breakfast, Lunch, Dinner", accommodation: "Lake Nakuru Luxury Lodge" },
+      { day: 6, title: "Into the Masai Mara", description: "Drive to the legendary Masai Mara — the world's greatest wildlife reserve. Arrive in time for an evening game drive as the Mara's resident lions begin their nocturnal patrols across the golden plains.", meals: "Breakfast, Dinner", accommodation: "Masai Mara Luxury Camp" },
+      { day: 7, title: "Full Day Masai Mara", description: "The highlight of the entire tour — a full day in the Masai Mara ecosystem. Dawn game drive to catch early morning predator activity, midday picnic in the bush, and late afternoon drive when golden light illuminates the savanna.", meals: "Breakfast, Packed Lunch, Dinner", accommodation: "Masai Mara Luxury Camp" },
+      { day: 8, title: "Final Game Drive & Departure", description: "One last sunrise game drive in the Mara before packing up and driving back to Nairobi. Transfer to JKIA for your departure flight, carrying memories that will last a lifetime.", meals: "Breakfast, Lunch", accommodation: "N/A — Departure Day" },
+    ],
   },
   {
     id: 11,
@@ -179,6 +285,19 @@ export const allTours: Tour[] = [
     includes: ["Premium lodges", "Beach resort", "Full board", "Park fees", "Cultural tour"],
     badge: "Complete Package",
     badgeColor: "bg-savanna",
+    description: "Ten days covering Kenya from top to bottom — three legendary national parks plus a stunning finale on Watamu's pristine coral coast. The most complete Kenya experience available.",
+    itinerary: [
+      { day: 1, title: "Arrival in Nairobi", description: "Arrive at JKIA and meet your guide. Check into your hotel and enjoy an orientation dinner discussing the incredible 10 days ahead.", meals: "Dinner", accommodation: "Nairobi Hotel" },
+      { day: 2, title: "Amboseli National Park", description: "Drive south to Amboseli with views of Kilimanjaro. Afternoon game drive watching the park's famous large elephant bulls and herds move across the swamps and dusty plains with Africa's highest mountain gleaming in the distance.", meals: "Breakfast, Lunch, Dinner", accommodation: "Amboseli Safari Lodge" },
+      { day: 3, title: "Amboseli Full Day", description: "Full day at Amboseli — morning game drive focusing on elephants and predators, afternoon guided walk with armed Maasai scouts near the swampland. Superb photography opportunities throughout the day.", meals: "Breakfast, Lunch, Dinner", accommodation: "Amboseli Safari Lodge" },
+      { day: 4, title: "Tsavo East & West", description: "Drive through Tsavo — Kenya's largest protected area. Spot the famous red-dust elephants of Tsavo East and the dramatic lava flows and Mzima Springs of Tsavo West. Overnight in the heart of this wild landscape.", meals: "Breakfast, Lunch, Dinner", accommodation: "Tsavo Safari Lodge" },
+      { day: 5, title: "Tsavo Full Day", description: "Full day exploring Tsavo's immense wilderness — river game drives along the Galana, Lugard Falls, and the remote Yatta Plateau. Tsavo's lions are known for being maneless — spot them if you can.", meals: "Breakfast, Lunch, Dinner", accommodation: "Tsavo Safari Lodge" },
+      { day: 6, title: "Transfer to Masai Mara", description: "Drive northwest to the Masai Mara — the crown jewel of Kenyan safaris. Arrive in time for a sunset game drive on the golden plains, home to the highest density of lions in Africa.", meals: "Breakfast, Dinner", accommodation: "Masai Mara Premium Camp" },
+      { day: 7, title: "Masai Mara Full Day", description: "Dawn to dusk in the Mara — two extended game drives covering the Mara Triangle and central plains. The Great Migration (July–October) fills the plains with wildebeest and the dramatic river crossings at Mara River.", meals: "Breakfast, Packed Lunch, Dinner", accommodation: "Masai Mara Premium Camp" },
+      { day: 8, title: "Fly to Watamu Beach", description: "Morning game drive then fly to Malindi and transfer to your beach resort at Watamu — one of Kenya's most beautiful and least-crowded coastal destinations, surrounded by a UNESCO marine park.", meals: "Breakfast, Dinner", accommodation: "Watamu Beach Resort" },
+      { day: 9, title: "Watamu Marine Park & Leisure", description: "Full day at Watamu — morning snorkeling or diving in the crystal-clear Watamu Marine National Park, rich with coral, turtles, and hundreds of tropical fish species. Afternoon at leisure on the beach.", meals: "Breakfast, Dinner", accommodation: "Watamu Beach Resort" },
+      { day: 10, title: "Beach Farewell & Departure", description: "Final morning on Watamu's spectacular beach before transfer to Malindi Airport for your departure flight. An extraordinary 10-day journey through the heart of Kenya comes to a perfect close.", meals: "Breakfast, Lunch", accommodation: "N/A — Departure Day" },
+    ],
   },
   {
     id: 12,
@@ -194,6 +313,13 @@ export const allTours: Tour[] = [
     includes: ["Shared 4×4 van", "Mid-range lodge", "Full board", "Park fees", "Guide"],
     badge: "Budget Friendly",
     badgeColor: "bg-forest",
+    description: "Kenya's two most iconic wildlife destinations in just four days — perfect for travellers short on time. Shared 4×4 safari van keeps costs down without compromising on the wildlife.",
+    itinerary: [
+      { day: 1, title: "Nairobi to Lake Nakuru", description: "Depart Nairobi in your shared 4×4 safari van and drive to Lake Nakuru National Park. Afternoon game drive around the lake looking for rhinos, lions, leopards, and the famous flamingo flocks that turn the shoreline pink.", meals: "Lunch, Dinner", accommodation: "Lake Nakuru Mid-Range Lodge" },
+      { day: 2, title: "Lake Nakuru to Masai Mara", description: "Morning game drive at Lake Nakuru — both black and white rhinos can be spotted at close range here. After lunch, drive to the Masai Mara via the Mara Escarpment with sweeping views of the plains below.", meals: "Breakfast, Lunch, Dinner", accommodation: "Masai Mara Camp" },
+      { day: 3, title: "Full Day Masai Mara", description: "The highlight — a full day in the Masai Mara with morning and afternoon game drives. The Big Five, cheetahs, and enormous herds of wildebeest and zebra make this one of the world's great wildlife experiences.", meals: "Breakfast, Packed Lunch, Dinner", accommodation: "Masai Mara Camp" },
+      { day: 4, title: "Final Game Drive & Return Nairobi", description: "Early morning game drive before driving back to Nairobi. Arrive early evening with lion roars still ringing in your ears.", meals: "Breakfast, Lunch", accommodation: "N/A — Departure Day" },
+    ],
   },
   {
     id: 13,
@@ -209,5 +335,12 @@ export const allTours: Tour[] = [
     includes: ["Private jeep", "Mid-range lodge", "Full board", "Park fees", "Expert guide"],
     badge: "Private",
     badgeColor: "bg-forest-light",
+    description: "The same iconic 4-day circuit as our group tour — but entirely private. Your own jeep, your own guide, your own schedule. Maximum flexibility, maximum wildlife intimacy.",
+    itinerary: [
+      { day: 1, title: "Nairobi to Lake Nakuru — Private", description: "Depart Nairobi in your exclusive private jeep and drive to Lake Nakuru National Park. Your expert guide takes you off the beaten track to find the park's rhinos, lions, and leopards at your own pace.", meals: "Lunch, Dinner", accommodation: "Lake Nakuru Lodge" },
+      { day: 2, title: "Nakuru to Masai Mara — Private", description: "Morning rhino tracking session in Nakuru — both species are accessible on foot with an armed ranger. After lunch, drive to the Masai Mara via the spectacular Mara Escarpment viewpoint.", meals: "Breakfast, Lunch, Dinner", accommodation: "Masai Mara Tented Camp" },
+      { day: 3, title: "Private Mara Full Day", description: "A full private day in the Masai Mara — your guide knows the best lion prides, cheetah territories, and elephant trails. Stop when you want, stay as long as you want, go wherever the action is.", meals: "Breakfast, Packed Lunch, Dinner", accommodation: "Masai Mara Tented Camp" },
+      { day: 4, title: "Final Drive & Return Nairobi", description: "Private dawn game drive — often the best time for cat sightings — before driving back to Nairobi. A short, intense, and deeply satisfying private Kenya safari.", meals: "Breakfast, Lunch", accommodation: "N/A — Departure Day" },
+    ],
   },
 ];
