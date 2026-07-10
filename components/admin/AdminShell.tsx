@@ -45,6 +45,7 @@ const NAV = [
       { label: "HR Overview", href: "/admin/hr" },
       { label: "Staff", href: "/admin/hr/staff" },
       { label: "Leave Requests", href: "/admin/hr/leave" },
+      { label: "Payroll", href: "/admin/hr/payroll" },
     ],
   },
 ];

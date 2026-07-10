@@ -2,6 +2,7 @@ import { allTours } from "@/data/tours";
 import type {
   AdminTour, StaffMember, LeaveRequest,
   Lead, FollowUp, Sale, Expense,
+  PayrollRun, PayrollEntry,
 } from "@/types/admin";
 
 const ADMIN_PASSWORD = "Jacmiya@2026";
@@ -12,6 +13,7 @@ const RATE_KEY = "jm_rate";
 const LEADS_KEY = "jm_leads";
 const SALES_KEY = "jm_sales";
 const EXPENSES_KEY = "jm_expenses";
+const PAYROLL_KEY = "jm_payroll";
 const DEFAULT_RATE = 129;
 
 const INITIAL_STAFF: StaffMember[] = [
@@ -262,3 +264,62 @@ export function updateExpense(id: string, updates: Partial<Expense>): void {
 }
 
 export function deleteExpense(id: string): void { saveExpenses(getExpenses().filter((e) => e.id !== id)); }
+
+// ─── Payroll ──────────────────────────────────────────────────────────────────
+
+const INITIAL_PAYROLL: PayrollRun[] = [
+  {
+    id: "pay_1",
+    month: "2026-06",
+    label: "June 2026",
+    entries: [
+      { staffId: "s1", staffName: "Jacmiya Wambua",  role: "Founder & CEO",            department: "Management", baseSalary: 250000, bonus: 0,     deduction: 0, netPay: 250000, notes: "" },
+      { staffId: "s2", staffName: "James Mwangi",    role: "Head Safari Guide",         department: "Guides",     baseSalary: 85000,  bonus: 5000,  deduction: 0, netPay: 90000,  notes: "Performance bonus" },
+      { staffId: "s3", staffName: "Grace Njeri",     role: "Sales Manager",             department: "Sales",      baseSalary: 95000,  bonus: 15000, deduction: 0, netPay: 110000, notes: "Sales target bonus" },
+      { staffId: "s4", staffName: "David Kamau",     role: "Senior Driver / Guide",     department: "Drivers",    baseSalary: 65000,  bonus: 0,     deduction: 0, netPay: 65000,  notes: "" },
+      { staffId: "s5", staffName: "Sarah Wanjiku",   role: "Operations Coordinator",    department: "Operations", baseSalary: 75000,  bonus: 0,     deduction: 0, netPay: 75000,  notes: "" },
+      { staffId: "s6", staffName: "Peter Ochieng",   role: "Safari Guide",              department: "Guides",     baseSalary: 70000,  bonus: 0,     deduction: 0, netPay: 70000,  notes: "" },
+      { staffId: "s7", staffName: "Mary Njoroge",    role: "Admin Assistant",           department: "Admin",      baseSalary: 55000,  bonus: 0,     deduction: 0, netPay: 55000,  notes: "" },
+    ],
+    totalBasicKsh: 695000,
+    totalBonusKsh: 20000,
+    totalDeductionKsh: 0,
+    totalNetKsh: 715000,
+    totalNetUsd: 5543,
+    rate: 129,
+    processedAt: "2026-07-01T09:00:00.000Z",
+    notes: "June 2026 payroll — processed on time.",
+  },
+];
+
+export function getPayroll(): PayrollRun[] {
+  if (typeof window === "undefined") return [];
+  const raw = localStorage.getItem(PAYROLL_KEY);
+  if (raw) return JSON.parse(raw) as PayrollRun[];
+  localStorage.setItem(PAYROLL_KEY, JSON.stringify(INITIAL_PAYROLL));
+  return INITIAL_PAYROLL;
+}
+
+export function savePayroll(runs: PayrollRun[]): void { localStorage.setItem(PAYROLL_KEY, JSON.stringify(runs)); }
+
+export function getPayrollRun(id: string): PayrollRun | undefined { return getPayroll().find((r) => r.id === id); }
+
+export function isMonthProcessed(month: string): boolean { return getPayroll().some((r) => r.month === month); }
+
+export function processPayroll(run: Omit<PayrollRun, "id" | "processedAt">): PayrollRun {
+  const newRun: PayrollRun = { ...run, id: `pay_${Date.now()}`, processedAt: new Date().toISOString() };
+  // Auto-create an expense entry for the total wages
+  const expense = addExpense({
+    date: run.month + "-01",
+    category: "Staff Wages",
+    description: `Payroll — ${run.label} (${run.entries.length} staff)`,
+    amountKsh: run.totalNetKsh,
+    amountUsd: run.totalNetUsd,
+    receiptRef: `PAYROLL-${run.month}`,
+  });
+  newRun.expenseId = expense.id;
+  savePayroll([...getPayroll(), newRun]);
+  return newRun;
+}
+
+export function deletePayrollRun(id: string): void { savePayroll(getPayroll().filter((r) => r.id !== id)); }

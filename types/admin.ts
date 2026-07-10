@@ -126,6 +126,36 @@ export interface Sale {
   updatedAt: string;
 }
 
+// ─── Payroll ──────────────────────────────────────────────────────────────────
+
+export interface PayrollEntry {
+  staffId: string;
+  staffName: string;
+  role: string;
+  department: Department;
+  baseSalary: number;
+  bonus: number;
+  deduction: number;
+  netPay: number;
+  notes: string;
+}
+
+export interface PayrollRun {
+  id: string;
+  month: string;       // "2026-07"
+  label: string;       // "July 2026"
+  entries: PayrollEntry[];
+  totalBasicKsh: number;
+  totalBonusKsh: number;
+  totalDeductionKsh: number;
+  totalNetKsh: number;
+  totalNetUsd: number;
+  rate: number;
+  processedAt: string;
+  notes: string;
+  expenseId?: string;
+}
+
 // ─── Expenses ─────────────────────────────────────────────────────────────────
 
 export type ExpenseCategory =
