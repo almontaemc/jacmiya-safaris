@@ -44,12 +44,13 @@ export default function VideoHero() {
               className="relative rounded-3xl overflow-hidden shadow-2xl ring-1 ring-white/10"
               style={{ width: "min(340px, 85vw)", aspectRatio: "9/16" }}
             >
-              <iframe
-                src="https://www.youtube.com/embed/s3X-KOGp_is?autoplay=1&mute=1&loop=1&playlist=s3X-KOGp_is&controls=1&rel=0&modestbranding=1"
-                className="absolute inset-0 w-full h-full"
-                allow="autoplay; encrypted-media; fullscreen"
-                allowFullScreen
-                title="Jacmiya Safaris — Wild Africa"
+              <video
+                src="/hero-video.mp4"
+                className="absolute inset-0 w-full h-full object-cover"
+                autoPlay
+                muted
+                loop
+                playsInline
               />
             </div>
           </div>
