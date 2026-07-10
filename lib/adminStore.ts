@@ -188,17 +188,23 @@ export function getTours(): AdminTour[] {
   const raw = localStorage.getItem(TOURS_KEY);
   if (raw) {
     const tours = JSON.parse(raw) as AdminTour[];
-    const needsMigration = tours.some((t) => !t.itinerary);
-    if (needsMigration) {
-      const migrated = tours.map((t) => ({
-        ...t,
-        itinerary: t.itinerary ?? (allTours.find((st) => st.id === t.id)?.itinerary ?? []),
-        description: t.description ?? allTours.find((st) => st.id === t.id)?.description,
-      }));
-      localStorage.setItem(TOURS_KEY, JSON.stringify(migrated));
-      return migrated;
+    // Clear cached data if it still has old WordPress/external image URLs
+    const hasOldImages = tours.some((t) => t.image?.startsWith("http"));
+    if (hasOldImages) {
+      localStorage.removeItem(TOURS_KEY);
+    } else {
+      const needsMigration = tours.some((t) => !t.itinerary);
+      if (needsMigration) {
+        const migrated = tours.map((t) => ({
+          ...t,
+          itinerary: t.itinerary ?? (allTours.find((st) => st.id === t.id)?.itinerary ?? []),
+          description: t.description ?? allTours.find((st) => st.id === t.id)?.description,
+        }));
+        localStorage.setItem(TOURS_KEY, JSON.stringify(migrated));
+        return migrated;
+      }
+      return tours;
     }
-    return tours;
   }
   const initial: AdminTour[] = allTours.map((t) => ({
     ...t,
