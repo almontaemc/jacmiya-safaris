@@ -2,7 +2,7 @@ import { Resend } from "resend";
 import { NextResponse } from "next/server";
 
 const NOTIFY_TO = "info@jacmiyasafaris.com";
-const FROM = "Jacmiya Safaris <onboarding@resend.dev>";
+const FROM = "Jacmiya Safaris <info@jacmiyasafaris.com>";
 
 export async function POST(req: Request) {
   if (!process.env.RESEND_API_KEY) {
