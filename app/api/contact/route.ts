@@ -128,9 +128,12 @@ export async function POST(req: Request) {
     return NextResponse.json({
       ok: staffResult.status === "fulfilled",
       autoReplyOk: clientResult.status === "fulfilled",
+      staffError: staffResult.status === "rejected" ? (staffResult.reason as Error)?.message : null,
+      clientError: clientResult.status === "rejected" ? (clientResult.reason as Error)?.message : null,
     });
   } catch (err) {
-    console.error("[contact/route] email error:", err);
-    return NextResponse.json({ ok: false, error: "Failed to send email" }, { status: 500 });
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[contact/route] email error:", msg);
+    return NextResponse.json({ ok: false, error: msg }, { status: 500 });
   }
 }
