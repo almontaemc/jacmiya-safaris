@@ -78,7 +78,7 @@ export default function AdminLogin() {
           </button>
 
           <p className="text-center text-gray-400 text-xs mt-5">
-            Default password: <span className="font-mono">Jacmiya@2026</span>
+            Authorised access only
           </p>
         </form>
       </div>

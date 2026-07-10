@@ -1,19 +1,24 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { NextResponse } from "next/server";
 
-// Until you verify jacmiyasafaris.com with Resend, leave FROM as the default.
-// After domain verification in Resend dashboard, set RESEND_FROM_EMAIL env var to:
-//   "Jacmiya Safaris <info@jacmiyasafaris.com>"
 const NOTIFY_TO = "info@jacmiyasafaris.com";
 
+function createTransport() {
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST ?? "mail.jacmiyasafaris.com",
+    port: Number(process.env.SMTP_PORT ?? 465),
+    secure: true,
+    auth: {
+      user: process.env.SMTP_USER ?? NOTIFY_TO,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+}
+
 export async function POST(req: Request) {
-  if (!process.env.RESEND_API_KEY) {
+  if (!process.env.SMTP_PASS) {
     return NextResponse.json({ ok: false, error: "Email service not configured" }, { status: 503 });
   }
-
-  // Instantiate inside handler so build doesn't throw without the env var
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  const FROM = process.env.RESEND_FROM_EMAIL ?? "Jacmiya Safaris <onboarding@resend.dev>";
 
   const body = await req.json() as {
     name: string;
@@ -44,7 +49,6 @@ export async function POST(req: Request) {
     `<tr><td style="padding:6px 12px;color:#6b7280;font-size:13px;white-space:nowrap;">${label}</td><td style="padding:6px 12px;color:#111827;font-size:13px;font-weight:500;">${value}</td></tr>`
   ).join("");
 
-  // ── 1. Notification to staff ──────────────────────────────────────────────
   const staffHtml = `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f9fafb;padding:24px;">
       <div style="background:#3d5a3e;padding:24px 28px;border-radius:12px 12px 0 0;">
@@ -68,7 +72,6 @@ export async function POST(req: Request) {
     </div>
   `;
 
-  // ── 2. Auto-reply to client ───────────────────────────────────────────────
   const clientHtml = `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f9fafb;padding:24px;">
       <div style="background:#3d5a3e;padding:32px 28px;border-radius:12px 12px 0 0;text-align:center;">
@@ -76,7 +79,7 @@ export async function POST(req: Request) {
         <p style="color:rgba(255,255,255,0.7);margin:0;font-size:14px;">Discover the Wild Heart of Africa</p>
       </div>
       <div style="background:#fff;padding:32px 28px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none;">
-        <h2 style="color:#1f2937;margin:0 0 12px;font-size:20px;">Thank you, ${name}! 🦁</h2>
+        <h2 style="color:#1f2937;margin:0 0 12px;font-size:20px;">Thank you, ${name}!</h2>
         <p style="color:#4b5563;font-size:15px;line-height:1.7;margin:0 0 16px;">
           We've received your safari enquiry and our team is already working on a personalised proposal for you.
           You can expect to hear from us within <strong>24 hours</strong>.
@@ -104,28 +107,28 @@ export async function POST(req: Request) {
   `;
 
   try {
-    // Send both in parallel
+    const transport = createTransport();
     const [staffResult, clientResult] = await Promise.allSettled([
-      resend.emails.send({
-        from: FROM,
-        to: [NOTIFY_TO],
+      transport.sendMail({
+        from: `"Jacmiya Safaris" <${NOTIFY_TO}>`,
+        to: NOTIFY_TO,
         replyTo: email,
-        subject: `🦁 New Safari Enquiry — ${name} (${destination || tourInterest || "Custom"})`,
+        subject: `New Safari Enquiry — ${name} (${destination || tourInterest || "Custom"})`,
         html: staffHtml,
       }),
-      resend.emails.send({
-        from: FROM,
-        to: [email],
+      transport.sendMail({
+        from: `"Jacmiya Safaris" <${NOTIFY_TO}>`,
+        to: email,
         replyTo: NOTIFY_TO,
         subject: `Your Jacmiya Safaris Enquiry — We'll be in touch within 24 hours`,
         html: clientHtml,
       }),
     ]);
 
-    const staffOk = staffResult.status === "fulfilled" && !staffResult.value.error;
-    const clientOk = clientResult.status === "fulfilled" && !clientResult.value.error;
-
-    return NextResponse.json({ ok: staffOk, autoReplyOk: clientOk });
+    return NextResponse.json({
+      ok: staffResult.status === "fulfilled",
+      autoReplyOk: clientResult.status === "fulfilled",
+    });
   } catch (err) {
     console.error("[contact/route] email error:", err);
     return NextResponse.json({ ok: false, error: "Failed to send email" }, { status: 500 });

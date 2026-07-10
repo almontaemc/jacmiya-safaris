@@ -114,12 +114,12 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
   const Sidebar = (
     <aside className="w-64 flex-shrink-0 bg-bark flex flex-col h-full">
-      <div className="px-6 py-5 border-b border-white/10">
-        <div className="flex items-center gap-3">
+      <div className="px-4 py-4 border-b border-white/10">
+        <div className="bg-white rounded-xl px-3 py-2 flex items-center justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="Jacmiya Safaris" className="h-10 w-auto" />
+          <img src="/logo.png" alt="Jacmiya Safaris" className="h-14 w-auto" />
         </div>
-        <p className="text-white/30 text-xs mt-2 uppercase tracking-widest">Admin Portal</p>
+        <p className="text-white/30 text-xs mt-2 uppercase tracking-widest text-center">Admin Portal</p>
       </div>
 
       <nav className="flex-1 px-3 py-4 overflow-y-auto space-y-1">

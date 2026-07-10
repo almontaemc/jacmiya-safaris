@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import { Menu, X, Phone, ChevronDown, Search, Check } from "lucide-react";
+import { Menu, X, Phone, ChevronDown, Search, Check, Star } from "lucide-react";
 import { useCurrency, type Currency } from "@/context/CurrencyContext";
 
 const links = [
@@ -72,6 +72,14 @@ export default function Navbar() {
             >
               <Search className="w-3.5 h-3.5" />
               Search Tours
+            </Link>
+            {/* Leave a Review */}
+            <Link
+              href="/reviews/new"
+              className="flex items-center gap-1.5 text-bark/70 hover:text-savanna text-sm font-medium transition-colors tracking-wide"
+            >
+              <Star className="w-3.5 h-3.5" />
+              Leave a Review
             </Link>
           </div>
 
@@ -168,6 +176,15 @@ export default function Navbar() {
           >
             <Search className="w-4 h-4" />
             Search Tours
+          </Link>
+          {/* Leave a Review mobile */}
+          <Link
+            href="/reviews/new"
+            onClick={() => setMenuOpen(false)}
+            className="flex items-center gap-2 text-bark/80 hover:text-savanna py-2.5 text-sm font-medium border-b border-sand transition-colors"
+          >
+            <Star className="w-4 h-4" />
+            Leave a Review
           </Link>
 
           {/* Currency toggle mobile */}

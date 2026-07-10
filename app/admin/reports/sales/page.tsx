@@ -77,11 +77,15 @@ export default function SalesReportPage() {
       </div>
 
       {/* Print header */}
-      <div className="hidden print:block border-b border-gray-300 pb-5">
+      <div className="hidden print:block border-b border-gray-300 pb-5 mb-6">
         <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">{companyName}</h1>
-            <h2 className="text-base font-semibold text-gray-700 mt-1">Sales & Bookings Report</h2>
+          <div className="flex items-center gap-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt={companyName} style={{ height: 56, width: "auto", background: "#fff" }} />
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">{companyName}</h1>
+              <h2 className="text-base font-semibold text-gray-600 mt-0.5">Sales & Bookings Report</h2>
+            </div>
           </div>
           <div className="text-right text-sm text-gray-500">
             <div>Generated: {now}</div>
