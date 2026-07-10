@@ -6,7 +6,7 @@ import Link from "next/link";
 import { isAuthenticated, logout } from "@/lib/adminStore";
 import {
   LayoutDashboard, Map, Users, CalendarDays, LogOut,
-  Menu, X, ChevronDown, ChevronRight,
+  Menu, ChevronDown, ChevronRight, Target, DollarSign, Receipt,
 } from "lucide-react";
 
 const NAV = [
@@ -16,6 +16,27 @@ const NAV = [
     children: [
       { label: "All Tours", href: "/admin/tours" },
       { label: "Add Tour", href: "/admin/tours/new" },
+    ],
+  },
+  {
+    label: "Leads", icon: Target,
+    children: [
+      { label: "All Leads", href: "/admin/leads" },
+      { label: "Add Lead", href: "/admin/leads/new" },
+    ],
+  },
+  {
+    label: "Sales", icon: DollarSign,
+    children: [
+      { label: "All Bookings", href: "/admin/sales" },
+      { label: "Add Booking", href: "/admin/sales/new" },
+    ],
+  },
+  {
+    label: "Expenses", icon: Receipt,
+    children: [
+      { label: "All Expenses", href: "/admin/expenses" },
+      { label: "Add Expense", href: "/admin/expenses/new" },
     ],
   },
   {
@@ -33,7 +54,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [expanded, setExpanded] = useState<string[]>(["Tours", "Human Resources"]);
+  const [expanded, setExpanded] = useState<string[]>(["Tours", "Leads", "Sales", "Expenses", "Human Resources"]);
 
   useEffect(() => {
     setMounted(true);
@@ -43,14 +64,11 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   }, [pathname, router]);
 
   if (!mounted) return null;
-
   if (pathname === "/admin/login") return <>{children}</>;
   if (!isAuthenticated()) return null;
 
   function toggleSection(label: string) {
-    setExpanded((prev) =>
-      prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]
-    );
+    setExpanded((prev) => prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]);
   }
 
   function isActive(href: string) {
@@ -65,7 +83,6 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
   const Sidebar = (
     <aside className="w-64 flex-shrink-0 bg-bark flex flex-col h-full">
-      {/* Brand */}
       <div className="px-6 py-5 border-b border-white/10">
         <div className="flex items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -74,21 +91,12 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         <p className="text-white/30 text-xs mt-2 uppercase tracking-widest">Admin Portal</p>
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 px-3 py-4 overflow-y-auto space-y-1">
         {NAV.map((item) => {
           if (!item.children) {
             return (
-              <Link
-                key={item.href}
-                href={item.href!}
-                onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive(item.href!)
-                    ? "bg-savanna/20 text-savanna"
-                    : "text-white/60 hover:text-white hover:bg-white/5"
-                }`}
-              >
+              <Link key={item.href} href={item.href!} onClick={() => setSidebarOpen(false)}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive(item.href!) ? "bg-savanna/20 text-savanna" : "text-white/60 hover:text-white hover:bg-white/5"}`}>
                 <item.icon className="w-4 h-4 flex-shrink-0" />
                 {item.label}
               </Link>
@@ -100,12 +108,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
           return (
             <div key={item.label}>
-              <button
-                onClick={() => toggleSection(item.label)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  anyChildActive ? "text-savanna" : "text-white/60 hover:text-white hover:bg-white/5"
-                }`}
-              >
+              <button onClick={() => toggleSection(item.label)}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${anyChildActive ? "text-savanna" : "text-white/60 hover:text-white hover:bg-white/5"}`}>
                 <item.icon className="w-4 h-4 flex-shrink-0" />
                 <span className="flex-1 text-left">{item.label}</span>
                 {open ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
@@ -113,16 +117,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
               {open && (
                 <div className="ml-7 mt-1 space-y-0.5">
                   {item.children.map((child) => (
-                    <Link
-                      key={child.href}
-                      href={child.href}
-                      onClick={() => setSidebarOpen(false)}
-                      className={`block px-3 py-2 rounded-lg text-sm transition-colors ${
-                        isActive(child.href)
-                          ? "bg-savanna/20 text-savanna font-semibold"
-                          : "text-white/50 hover:text-white hover:bg-white/5"
-                      }`}
-                    >
+                    <Link key={child.href} href={child.href} onClick={() => setSidebarOpen(false)}
+                      className={`block px-3 py-2 rounded-lg text-sm transition-colors ${isActive(child.href) ? "bg-savanna/20 text-savanna font-semibold" : "text-white/50 hover:text-white hover:bg-white/5"}`}>
                       {child.label}
                     </Link>
                   ))}
@@ -133,16 +129,12 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         })}
       </nav>
 
-      {/* Footer */}
       <div className="px-3 py-4 border-t border-white/10">
         <div className="px-3 py-2 mb-1">
           <p className="text-white/80 text-sm font-medium">Jacmiya Admin</p>
           <p className="text-white/30 text-xs">jacmiya@jacmiyasafaris.com</p>
         </div>
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/50 hover:text-red-400 hover:bg-white/5 transition-colors"
-        >
+        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/50 hover:text-red-400 hover:bg-white/5 transition-colors">
           <LogOut className="w-4 h-4" />
           Sign Out
         </button>
@@ -152,10 +144,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ backgroundColor: "#f8f7f4" }}>
-      {/* Desktop sidebar */}
       <div className="hidden lg:flex">{Sidebar}</div>
 
-      {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
           <div className="flex">{Sidebar}</div>
@@ -163,15 +153,9 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         </div>
       )}
 
-      {/* Main */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar */}
         <header className="bg-white border-b border-gray-200 px-4 lg:px-6 py-3 flex items-center gap-4 flex-shrink-0">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="lg:hidden text-gray-500 hover:text-gray-700"
-            aria-label="Open menu"
-          >
+          <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-gray-500 hover:text-gray-700" aria-label="Open menu">
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex-1">
@@ -180,7 +164,6 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           <span className="text-xs text-gray-400 hidden sm:block">Jacmiya Safaris Admin</span>
         </header>
 
-        {/* Page content */}
         <main className="flex-1 overflow-y-auto p-4 lg:p-6">
           {children}
         </main>

@@ -70,3 +70,81 @@ export interface LeaveRequest {
   reviewedAt?: string;
   reviewNote?: string;
 }
+
+// ─── Leads ────────────────────────────────────────────────────────────────────
+
+export type LeadStatus = "New" | "Contacted" | "Quoted" | "Negotiating" | "Won" | "Lost";
+export type LeadSource = "Website" | "Referral" | "Social Media" | "Phone" | "Walk-in" | "Email";
+
+export interface FollowUp {
+  id: string;
+  date: string;
+  note: string;
+}
+
+export interface Lead {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  destination: string;
+  travelDates: string;
+  travelers: string;
+  budget: string;
+  message: string;
+  tourInterest: string;
+  source: LeadSource;
+  status: LeadStatus;
+  followUps: FollowUp[];
+  convertedSaleId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ─── Sales / Bookings ─────────────────────────────────────────────────────────
+
+export type PaymentStatus = "Pending Deposit" | "Deposit Paid" | "Fully Paid" | "Refunded" | "Cancelled";
+
+export interface Sale {
+  id: string;
+  leadId?: string;
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  tourTitle: string;
+  tourId?: number;
+  travelFrom: string;
+  travelTo: string;
+  pax: number;
+  amountKsh: number;
+  amountUsd: number;
+  depositKsh: number;
+  depositUsd: number;
+  paymentStatus: PaymentStatus;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ─── Expenses ─────────────────────────────────────────────────────────────────
+
+export type ExpenseCategory =
+  | "Park Fees"
+  | "Fuel"
+  | "Accommodation"
+  | "Staff Wages"
+  | "Vehicle Maintenance"
+  | "Marketing"
+  | "Office"
+  | "Other";
+
+export interface Expense {
+  id: string;
+  date: string;
+  category: ExpenseCategory;
+  description: string;
+  amountKsh: number;
+  amountUsd: number;
+  receiptRef: string;
+  createdAt: string;
+}
