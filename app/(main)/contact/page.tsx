@@ -72,6 +72,30 @@ export default function Contact() {
             </div>
 
             <div>
+              <h3 className="font-semibold text-bark text-xs uppercase tracking-wider mb-3">Europe Representative</h3>
+              <div className="space-y-3">
+                <a href="tel:+41766861193" className="flex items-center gap-4 bg-white rounded-xl p-4 border border-sand hover:border-savanna/40 transition-colors group">
+                  <div className="w-10 h-10 bg-forest/10 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-savanna transition-colors">
+                    <Phone className="w-5 h-5 text-forest group-hover:text-white transition-colors" />
+                  </div>
+                  <div>
+                    <div className="text-bark font-semibold text-sm">Rashmi · Europe</div>
+                    <div className="text-earth text-sm">+41 76 686 11 93</div>
+                  </div>
+                </a>
+                <a href="mailto:rashmi@jacmiyasafaris.com" className="flex items-center gap-4 bg-white rounded-xl p-4 border border-sand hover:border-savanna/40 transition-colors group">
+                  <div className="w-10 h-10 bg-forest/10 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-savanna transition-colors">
+                    <Mail className="w-5 h-5 text-forest group-hover:text-white transition-colors" />
+                  </div>
+                  <div>
+                    <div className="text-bark font-semibold text-sm">Email · Europe</div>
+                    <div className="text-earth text-sm">rashmi@jacmiyasafaris.com</div>
+                  </div>
+                </a>
+              </div>
+            </div>
+
+            <div>
               <h3 className="font-semibold text-bark text-xs uppercase tracking-wider mb-3">Follow Us</h3>
               <div className="flex gap-3">
                 <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-forest flex items-center justify-center hover:bg-savanna transition-colors text-cream font-bold text-sm" aria-label="Facebook">f</a>
