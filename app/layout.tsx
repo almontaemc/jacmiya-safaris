@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Lato } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { CurrencyProvider } from "@/context/CurrencyContext";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -24,22 +21,11 @@ export const metadata: Metadata = {
     "Discover Africa's wild heart with Jacmiya Safaris. Expert-guided wildlife adventures across Kenya, Tanzania, and Rwanda. 70+ destinations, price-match guarantee.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      className={`${playfair.variable} ${lato.variable} h-full`}
-    >
+    <html lang="en" className={`${playfair.variable} ${lato.variable} h-full`}>
       <body className="min-h-full flex flex-col antialiased">
-        <CurrencyProvider>
-          <Navbar />
-          <main className="flex-1 pt-28">{children}</main>
-          <Footer />
-        </CurrencyProvider>
+        {children}
       </body>
     </html>
   );
