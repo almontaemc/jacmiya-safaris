@@ -1,25 +1,15 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import { NextResponse } from "next/server";
 
 const NOTIFY_TO = "info@jacmiyasafaris.com";
-
-function createTransport() {
-  const port = Number(process.env.SMTP_PORT ?? 587);
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST ?? "mail.jacmiyasafaris.com",
-    port,
-    secure: port === 465,
-    auth: {
-      user: process.env.SMTP_USER ?? NOTIFY_TO,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-}
+const FROM = "Jacmiya Safaris <info@jacmiyasafaris.com>";
 
 export async function POST(req: Request) {
-  if (!process.env.SMTP_PASS) {
+  if (!process.env.RESEND_API_KEY) {
     return NextResponse.json({ ok: false, error: "Email service not configured" }, { status: 503 });
   }
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   const body = await req.json() as {
     name: string;
@@ -57,9 +47,7 @@ export async function POST(req: Request) {
         <p style="color:rgba(255,255,255,0.7);margin:4px 0 0;font-size:13px;">Submitted via jacmiyasafaris.com</p>
       </div>
       <div style="background:#fff;padding:24px 28px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none;">
-        <table style="width:100%;border-collapse:collapse;">
-          ${tableRows}
-        </table>
+        <table style="width:100%;border-collapse:collapse;">${tableRows}</table>
         ${message ? `
         <div style="margin-top:16px;padding:16px;background:#f3f4f6;border-radius:8px;">
           <p style="margin:0 0 6px;font-size:12px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Message</p>
@@ -87,13 +75,8 @@ export async function POST(req: Request) {
         </p>
         <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:20px;margin:20px 0;">
           <p style="margin:0 0 10px;font-size:13px;color:#166534;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Your Enquiry Summary</p>
-          <table style="width:100%;border-collapse:collapse;">
-            ${tableRows}
-          </table>
+          <table style="width:100%;border-collapse:collapse;">${tableRows}</table>
         </div>
-        <p style="color:#4b5563;font-size:14px;line-height:1.7;margin:16px 0;">
-          In the meantime, feel free to browse our tours or give us a call:
-        </p>
         <div style="text-align:center;margin:24px 0;">
           <a href="https://jacmiyasafaris.com/tours" style="display:inline-block;background:#3d5a3e;color:#fff;text-decoration:none;padding:12px 28px;border-radius:50px;font-size:15px;font-weight:600;margin:0 6px 8px;">Browse Tours</a>
           <a href="tel:+254116482995" style="display:inline-block;background:#fff;color:#3d5a3e;text-decoration:none;padding:12px 28px;border-radius:50px;font-size:15px;font-weight:600;border:2px solid #3d5a3e;margin:0 6px 8px;">+254 116 482 995</a>
@@ -108,17 +91,16 @@ export async function POST(req: Request) {
   `;
 
   try {
-    const transport = createTransport();
     const [staffResult, clientResult] = await Promise.allSettled([
-      transport.sendMail({
-        from: `"Jacmiya Safaris" <${NOTIFY_TO}>`,
+      resend.emails.send({
+        from: FROM,
         to: NOTIFY_TO,
         replyTo: email,
         subject: `New Safari Enquiry — ${name} (${destination || tourInterest || "Custom"})`,
         html: staffHtml,
       }),
-      transport.sendMail({
-        from: `"Jacmiya Safaris" <${NOTIFY_TO}>`,
+      resend.emails.send({
+        from: FROM,
         to: email,
         replyTo: NOTIFY_TO,
         subject: `Your Jacmiya Safaris Enquiry — We'll be in touch within 24 hours`,

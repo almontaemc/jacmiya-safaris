@@ -1,25 +1,14 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import { NextResponse } from "next/server";
 
 const NOTIFY_TO = "info@jacmiyasafaris.com";
-
-function createTransport() {
-  const port = Number(process.env.SMTP_PORT ?? 587);
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST ?? "mail.jacmiyasafaris.com",
-    port,
-    secure: port === 465,
-    auth: {
-      user: process.env.SMTP_USER ?? NOTIFY_TO,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-}
+const FROM = "Jacmiya Safaris <info@jacmiyasafaris.com>";
 
 export async function POST(req: Request) {
-  if (!process.env.SMTP_PASS) {
+  if (!process.env.RESEND_API_KEY) {
     return NextResponse.json({ ok: false, error: "Email service not configured" }, { status: 503 });
   }
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   const body = await req.json() as {
     clientName: string;
@@ -150,17 +139,16 @@ export async function POST(req: Request) {
   `;
 
   try {
-    const transport = createTransport();
     const [clientResult, staffResult] = await Promise.allSettled([
-      transport.sendMail({
-        from: `"${companyName}" <${NOTIFY_TO}>`,
+      resend.emails.send({
+        from: FROM,
         to: clientEmail,
         replyTo: replyEmail,
         subject: `Booking Confirmed — ${bookingRef} | ${tourTitle} | ${companyName}`,
         html,
       }),
-      transport.sendMail({
-        from: `"${companyName}" <${NOTIFY_TO}>`,
+      resend.emails.send({
+        from: FROM,
         to: NOTIFY_TO,
         replyTo: clientEmail,
         subject: `Booking confirmation sent to ${clientName} — ${bookingRef}`,
@@ -173,7 +161,8 @@ export async function POST(req: Request) {
       staffOk: staffResult.status === "fulfilled",
     });
   } catch (err) {
-    console.error("[booking-confirmation/route] email error:", err);
-    return NextResponse.json({ ok: false, error: "Failed to send confirmation" }, { status: 500 });
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[booking-confirmation/route] email error:", msg);
+    return NextResponse.json({ ok: false, error: msg }, { status: 500 });
   }
 }
