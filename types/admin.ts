@@ -15,6 +15,7 @@ export interface AdminTour {
   priceksh: number;
   priceusd: number;
   groupSize: string;
+  maxPax?: number;
   image: string;
   highlights: string[];
   includes: string[];
@@ -96,6 +97,7 @@ export interface Lead {
   source: LeadSource;
   status: LeadStatus;
   followUps: FollowUp[];
+  nextFollowUp?: string;
   convertedSaleId?: string;
   createdAt: string;
   updatedAt: string;
@@ -107,6 +109,7 @@ export type PaymentStatus = "Pending Deposit" | "Deposit Paid" | "Fully Paid" | 
 
 export interface Sale {
   id: string;
+  bookingRef: string;
   leadId?: string;
   clientName: string;
   clientEmail: string;
@@ -124,36 +127,6 @@ export interface Sale {
   notes: string;
   createdAt: string;
   updatedAt: string;
-}
-
-// ─── Payroll ──────────────────────────────────────────────────────────────────
-
-export interface PayrollEntry {
-  staffId: string;
-  staffName: string;
-  role: string;
-  department: Department;
-  baseSalary: number;
-  bonus: number;
-  deduction: number;
-  netPay: number;
-  notes: string;
-}
-
-export interface PayrollRun {
-  id: string;
-  month: string;       // "2026-07"
-  label: string;       // "July 2026"
-  entries: PayrollEntry[];
-  totalBasicKsh: number;
-  totalBonusKsh: number;
-  totalDeductionKsh: number;
-  totalNetKsh: number;
-  totalNetUsd: number;
-  rate: number;
-  processedAt: string;
-  notes: string;
-  expenseId?: string;
 }
 
 // ─── Expenses ─────────────────────────────────────────────────────────────────
@@ -177,4 +150,62 @@ export interface Expense {
   amountUsd: number;
   receiptRef: string;
   createdAt: string;
+}
+
+// ─── Payroll ──────────────────────────────────────────────────────────────────
+
+export interface PayrollEntry {
+  staffId: string;
+  staffName: string;
+  role: string;
+  department: Department;
+  baseSalary: number;
+  bonus: number;
+  deduction: number;
+  netPay: number;
+  notes: string;
+}
+
+export interface PayrollRun {
+  id: string;
+  month: string;
+  label: string;
+  entries: PayrollEntry[];
+  totalBasicKsh: number;
+  totalBonusKsh: number;
+  totalDeductionKsh: number;
+  totalNetKsh: number;
+  totalNetUsd: number;
+  rate: number;
+  processedAt: string;
+  notes: string;
+  expenseId?: string;
+}
+
+// ─── Reviews / Testimonials ───────────────────────────────────────────────────
+
+export type ReviewRating = 1 | 2 | 3 | 4 | 5;
+
+export interface Review {
+  id: string;
+  clientName: string;
+  clientCountry: string;
+  tourTitle: string;
+  rating: ReviewRating;
+  body: string;
+  travelDate: string;
+  approved: boolean;
+  featured: boolean;
+  createdAt: string;
+}
+
+// ─── App Settings ─────────────────────────────────────────────────────────────
+
+export interface AppSettings {
+  companyName: string;
+  companyEmail: string;
+  companyPhone: string;
+  companyAddress: string;
+  companyWebsite: string;
+  tagline: string;
 }

@@ -88,7 +88,7 @@ export default function EditTour({ params }: { params: Promise<{ id: string }> }
   const [form, setFormState] = useState({
     title: "", destination: "Kenya" as "Kenya" | "Tanzania" | "Rwanda",
     duration: "5 days / 4 nights", days: 5, priceksh: 0, priceusd: 0,
-    groupSize: "2–8 people", image: "", badge: "Best Seller", badgeColor: "bg-savanna",
+    groupSize: "2–8 people", maxPax: 0, image: "", badge: "Best Seller", badgeColor: "bg-savanna",
     active: true, description: "",
   });
   const [highlights, setHighlights] = useState<string[]>([]);
@@ -102,7 +102,7 @@ export default function EditTour({ params }: { params: Promise<{ id: string }> }
       setFormState({
         title: found.title, destination: found.destination, duration: found.duration,
         days: found.days, priceksh: found.priceksh, priceusd: found.priceusd,
-        groupSize: found.groupSize, image: found.image, badge: found.badge,
+        groupSize: found.groupSize, maxPax: found.maxPax ?? 0, image: found.image, badge: found.badge,
         badgeColor: found.badgeColor, active: found.active, description: found.description ?? "",
       });
       setHighlights(found.highlights);
@@ -226,6 +226,11 @@ export default function EditTour({ params }: { params: Promise<{ id: string }> }
                 <select className={inputCls} value={form.groupSize} onChange={(e) => setF("groupSize", e.target.value)}>
                   {GROUP_SIZES.map((g) => <option key={g}>{g}</option>)}
                 </select>
+              </div>
+              <div>
+                <label className={labelCls}>Max Capacity (Pax)</label>
+                <input type="number" min={0} className={inputCls} value={form.maxPax || ""} onChange={(e) => setF("maxPax", Number(e.target.value))} placeholder="e.g. 12" />
+                <p className="text-xs text-gray-400 mt-1">0 = no limit</p>
               </div>
             </div>
           </div>

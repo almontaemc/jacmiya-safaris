@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { isAuthenticated, logout } from "@/lib/adminStore";
 import {
   LayoutDashboard, Map, Users, CalendarDays, LogOut,
   Menu, ChevronDown, ChevronRight, Target, DollarSign, Receipt,
+  BarChart2, Star, Settings, Search, X,
 } from "lucide-react";
 
 const NAV = [
@@ -39,6 +40,14 @@ const NAV = [
       { label: "Add Expense", href: "/admin/expenses/new" },
     ],
   },
+  { label: "Reports", href: "/admin/reports", icon: BarChart2 },
+  {
+    label: "Reviews", icon: Star,
+    children: [
+      { label: "All Reviews", href: "/admin/reviews" },
+      { label: "Add Review", href: "/admin/reviews/new" },
+    ],
+  },
   {
     label: "Human Resources", icon: Users,
     children: [
@@ -48,6 +57,7 @@ const NAV = [
       { label: "Payroll", href: "/admin/hr/payroll" },
     ],
   },
+  { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
@@ -55,7 +65,9 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [expanded, setExpanded] = useState<string[]>(["Tours", "Leads", "Sales", "Expenses", "Human Resources"]);
+  const [expanded, setExpanded] = useState<string[]>(["Tours", "Leads", "Sales", "Expenses", "Reviews", "Human Resources"]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -80,6 +92,14 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   function handleLogout() {
     logout();
     router.push("/admin/login");
+  }
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (!q) return;
+    router.push(`/admin/search?q=${encodeURIComponent(q)}`);
+    setSearchQuery("");
   }
 
   const Sidebar = (
@@ -162,7 +182,23 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           <div className="flex-1">
             <Breadcrumb pathname={pathname} />
           </div>
-          <span className="text-xs text-gray-400 hidden sm:block">Jacmiya Safaris Admin</span>
+          {/* Global search */}
+          <form onSubmit={handleSearch} className="hidden sm:flex items-center gap-2 bg-gray-100 rounded-xl px-3 py-1.5 w-56">
+            <Search className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+            <input
+              ref={searchRef}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search…"
+              className="bg-transparent text-sm text-gray-700 placeholder-gray-400 focus:outline-none flex-1 min-w-0"
+            />
+            {searchQuery && (
+              <button type="button" onClick={() => setSearchQuery("")} className="text-gray-400 hover:text-gray-600">
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </form>
+          <span className="text-xs text-gray-400 hidden lg:block">Jacmiya Safaris Admin</span>
         </header>
 
         <main className="flex-1 overflow-y-auto p-4 lg:p-6">

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import FeaturedTours from "@/components/FeaturedTours";
+import TestimonialsSection from "@/components/TestimonialsSection";
 
 const stats = [
   { value: "70+", label: "Destinations" },
@@ -19,12 +20,6 @@ const reasons = [
   { icon: "💰", title: "Price Match Guarantee", body: "Find the same safari cheaper elsewhere? We'll match it within 48 hours of your booking. No questions asked." },
   { icon: "🦁", title: "70+ Destinations", body: "From the Serengeti to Zanzibar, we cover the full breadth of East Africa's most breathtaking landscapes." },
   { icon: "📞", title: "24/7 Support", body: "Our dedicated team is always reachable — before, during, and after your journey. You're never on your own." },
-];
-
-const testimonials = [
-  { name: "Sarah M.", location: "United Kingdom", rating: 5, review: "Jacmiya Safaris exceeded every expectation. The guides were incredibly knowledgeable and passionate about wildlife. Seeing the Great Migration was a life-changing experience!" },
-  { name: "James & Linda K.", location: "United States", rating: 5, review: "Impeccable organization and attention to detail. The accommodations were luxurious, the transport was comfortable, and the price was unbeatable compared to other operators." },
-  { name: "Amara N.", location: "Nairobi, Kenya", rating: 5, review: "As a local, I was skeptical — but Jacmiya showed me corners of East Africa I'd never seen. The Rwanda gorilla trek was the highlight of my life. Absolutely world-class." },
 ];
 
 export default function Home() {
@@ -103,26 +98,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-24 px-4 bg-cream">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-14">
-            <span className="text-savanna text-sm font-semibold uppercase tracking-widest">Traveler Stories</span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-bark mt-2">What Our Guests Say</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((t) => (
-              <div key={t.name} className="bg-white rounded-2xl p-7 shadow-sm border border-sand flex flex-col">
-                <div className="flex gap-0.5 mb-4">{Array.from({ length: t.rating }).map((_, i) => <span key={i} className="text-savanna text-lg">★</span>)}</div>
-                <p className="text-earth text-sm leading-relaxed mb-6 italic flex-1">&ldquo;{t.review}&rdquo;</p>
-                <div className="border-t border-sand pt-4">
-                  <div className="font-semibold text-bark text-sm">{t.name}</div>
-                  <div className="text-earth text-xs mt-0.5">{t.location}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <TestimonialsSection />
 
       <section className="relative py-28 px-4 overflow-hidden" style={{ backgroundImage: "url('https://jacmiyasafaris.com/wp-content/uploads/2017/01/Safari-in-Serengeti-National-Park-Tanzania-700x482.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
         <div className="absolute inset-0 bg-bark/75" />

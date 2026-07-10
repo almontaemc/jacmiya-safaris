@@ -97,6 +97,7 @@ export default function NewTour() {
     priceksh: 0,
     priceusd: 0,
     groupSize: "2–8 people",
+    maxPax: 0,
     image: "",
     badge: "Best Seller",
     badgeColor: "bg-savanna",
@@ -234,6 +235,11 @@ export default function NewTour() {
                 <select className={inputCls} value={form.groupSize} onChange={(e) => setF("groupSize", e.target.value)}>
                   {GROUP_SIZES.map((g) => <option key={g}>{g}</option>)}
                 </select>
+              </div>
+              <div>
+                <label className={labelCls}>Max Capacity (Pax)</label>
+                <input type="number" min={0} className={inputCls} value={form.maxPax || ""} onChange={(e) => setF("maxPax", Number(e.target.value))} placeholder="e.g. 12" />
+                <p className="text-xs text-gray-400 mt-1">0 = no limit</p>
               </div>
             </div>
           </div>

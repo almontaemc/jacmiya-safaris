@@ -3,9 +3,9 @@
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { getLeads, updateLead, addFollowUp, addSale } from "@/lib/adminStore";
+import { getLeads, updateLead, addFollowUp } from "@/lib/adminStore";
 import type { Lead, LeadStatus, LeadSource } from "@/types/admin";
-import { ArrowLeft, Send, Trophy } from "lucide-react";
+import { ArrowLeft, Send, Trophy, FileText, Bell } from "lucide-react";
 
 const SOURCES: LeadSource[] = ["Website", "Referral", "Social Media", "Phone", "Walk-in", "Email"];
 const STATUSES: LeadStatus[] = ["New", "Contacted", "Quoted", "Negotiating", "Won", "Lost"];
@@ -29,6 +29,7 @@ export default function LeadDetail({ params }: { params: Promise<{ id: string }>
     name: "", email: "", phone: "", destination: "", travelDates: "",
     travelers: "", budget: "", message: "", tourInterest: "",
     source: "Website" as LeadSource, status: "New" as LeadStatus,
+    nextFollowUp: "",
   });
 
   function load() {
@@ -41,6 +42,7 @@ export default function LeadDetail({ params }: { params: Promise<{ id: string }>
         travelers: found.travelers, budget: found.budget,
         message: found.message, tourInterest: found.tourInterest,
         source: found.source, status: found.status,
+        nextFollowUp: found.nextFollowUp ?? "",
       });
     }
   }
@@ -75,6 +77,10 @@ export default function LeadDetail({ params }: { params: Promise<{ id: string }>
     router.push(`/admin/sales/new?leadId=${id}&name=${encodeURIComponent(lead.name)}&email=${encodeURIComponent(lead.email)}&phone=${encodeURIComponent(lead.phone)}&tour=${encodeURIComponent(lead.tourInterest)}`);
   }
 
+  const today = new Date().toISOString().slice(0, 10);
+  const followUpOverdue = form.nextFollowUp && form.nextFollowUp < today;
+  const followUpToday = form.nextFollowUp === today;
+
   const inputCls = "w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-800 bg-white placeholder-gray-400 focus:outline-none focus:border-purple-400 transition-colors";
   const labelCls = "block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5";
 
@@ -86,8 +92,24 @@ export default function LeadDetail({ params }: { params: Promise<{ id: string }>
           <h1 className="text-2xl font-bold text-gray-900">{lead.name}</h1>
           <p className="text-gray-500 text-sm">{lead.email}</p>
         </div>
-        <span className={`text-sm px-3 py-1 rounded-full font-semibold border ${STATUS_COLOR[lead.status]}`}>{lead.status}</span>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Link href={`/admin/leads/${id}/quote`}
+            className="flex items-center gap-1.5 border border-blue-200 text-blue-600 hover:bg-blue-50 text-xs font-semibold px-3 py-2 rounded-xl transition-colors">
+            <FileText className="w-3.5 h-3.5" /> Quote
+          </Link>
+          <span className={`text-sm px-3 py-1 rounded-full font-semibold border ${STATUS_COLOR[lead.status]}`}>{lead.status}</span>
+        </div>
       </div>
+
+      {/* Follow-up due banner */}
+      {(followUpOverdue || followUpToday) && (
+        <div className={`flex items-center gap-3 rounded-2xl px-5 py-3.5 border ${followUpOverdue ? "bg-red-50 border-red-200" : "bg-amber-50 border-amber-200"}`}>
+          <Bell className={`w-4 h-4 flex-shrink-0 ${followUpOverdue ? "text-red-600" : "text-amber-600"}`} />
+          <span className={`text-sm font-semibold ${followUpOverdue ? "text-red-800" : "text-amber-800"}`}>
+            {followUpOverdue ? `Follow-up overdue (was due ${form.nextFollowUp})` : "Follow-up due today"}
+          </span>
+        </div>
+      )}
 
       {/* Convert to sale */}
       {lead.status !== "Won" && lead.status !== "Lost" && (
@@ -153,6 +175,14 @@ export default function LeadDetail({ params }: { params: Promise<{ id: string }>
                 {s}
               </button>
             ))}
+          </div>
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <label className={labelCls}>
+              <Bell className="w-3.5 h-3.5 inline mr-1" />Next Follow-up Date
+            </label>
+            <input type="date" value={form.nextFollowUp} onChange={(e) => setF("nextFollowUp", e.target.value)}
+              className={`${inputCls} max-w-xs`} min={today} />
+            <p className="text-xs text-gray-400 mt-1">Shows as a reminder on the dashboard when due</p>
           </div>
         </Card>
 

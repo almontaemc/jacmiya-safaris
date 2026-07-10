@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getTours, getStaff, getLeave, getLeads, getSales, getExpenses } from "@/lib/adminStore";
 import type { AdminTour, StaffMember, LeaveRequest, Lead, Sale, Expense } from "@/types/admin";
-import { Map, Users, CalendarDays, TrendingUp, Plus, ArrowRight, Target, DollarSign, Receipt, TrendingDown } from "lucide-react";
+import { Map, Users, CalendarDays, TrendingUp, Plus, ArrowRight, Target, DollarSign, Receipt, TrendingDown, Bell } from "lucide-react";
 
 function fmtKsh(n: number) { return `KSH ${n.toLocaleString()}`; }
 function fmtUsd(n: number) { return `USD ${n.toLocaleString()}`; }
@@ -32,6 +32,7 @@ export default function AdminDashboard() {
 
   // P&L — current month
   const now = new Date();
+  const today = now.toISOString().slice(0, 10);
   const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   const monthSales = sales.filter((s) => s.createdAt.startsWith(thisMonth));
   const monthExpenses = expenses.filter((e) => e.date.startsWith(thisMonth));
@@ -49,9 +50,12 @@ export default function AdminDashboard() {
   const convRate = closedLeads > 0 ? Math.round((wonLeads / closedLeads) * 100) : 0;
 
   const activeTours = tours.filter((t) => t.active).length;
-  const activeStaff = staff.filter((s) => s.status === "Active").length;
-  const onLeave = staff.filter((s) => s.status === "On Leave").length;
   const pendingLeave = leave.filter((l) => l.status === "Pending").length;
+
+  // Follow-up reminders — leads with nextFollowUp <= today and not Won/Lost
+  const followUpsDue = leads
+    .filter((l) => !["Won", "Lost"].includes(l.status) && l.nextFollowUp && l.nextFollowUp <= today)
+    .sort((a, b) => (a.nextFollowUp ?? "").localeCompare(b.nextFollowUp ?? ""));
 
   const recentSales = [...sales].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5);
   const hotLeads = leads.filter((l) => !["Won", "Lost"].includes(l.status)).sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 5);
@@ -80,6 +84,44 @@ export default function AdminDashboard() {
         <p className="text-gray-500 text-sm mt-0.5">Welcome back — here&apos;s what&apos;s happening at Jacmiya Safaris.</p>
       </div>
 
+      {/* Follow-up reminders — shown only when there are dues */}
+      {followUpsDue.length > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-amber-200">
+            <div className="flex items-center gap-2">
+              <Bell className="w-4 h-4 text-amber-600" />
+              <span className="font-semibold text-amber-800 text-sm">Follow-up Reminders</span>
+              <span className="bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{followUpsDue.length}</span>
+            </div>
+            <Link href="/admin/leads" className="text-xs text-amber-700 hover:text-amber-900 font-medium flex items-center gap-1">
+              View all leads <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+          <div className="divide-y divide-amber-100">
+            {followUpsDue.map((l) => {
+              const isOverdue = l.nextFollowUp! < today;
+              const isTodayDue = l.nextFollowUp === today;
+              return (
+                <Link key={l.id} href={`/admin/leads/${l.id}`} className="flex items-center gap-3 px-5 py-3 hover:bg-amber-100/50 transition-colors">
+                  <div className="w-8 h-8 rounded-full bg-amber-200 flex items-center justify-center flex-shrink-0">
+                    <span className="text-amber-800 font-bold text-xs">{l.name.charAt(0)}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-amber-900">{l.name}</p>
+                    <p className="text-xs text-amber-700">{l.destination} · {l.tourInterest}</p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${isOverdue ? "bg-red-100 text-red-700" : "bg-amber-200 text-amber-800"}`}>
+                      {isOverdue ? `Overdue (${l.nextFollowUp})` : isTodayDue ? "Due today" : l.nextFollowUp}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* P&L Summary */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
@@ -88,6 +130,7 @@ export default function AdminDashboard() {
             <p className="text-xs text-gray-400 mt-0.5">Current month — {now.toLocaleString("default", { month: "long", year: "numeric" })}</p>
           </div>
           <div className="flex gap-2">
+            <Link href="/admin/reports" className="text-xs text-emerald-700 hover:text-emerald-800 font-semibold border border-emerald-200 rounded-lg px-3 py-1.5 transition-colors">Reports</Link>
             <Link href="/admin/sales" className="text-xs text-blue-600 hover:text-blue-700 font-semibold border border-blue-200 rounded-lg px-3 py-1.5 transition-colors">Sales</Link>
             <Link href="/admin/expenses" className="text-xs text-gray-600 hover:text-gray-800 font-semibold border border-gray-200 rounded-lg px-3 py-1.5 transition-colors">Expenses</Link>
           </div>
@@ -134,7 +177,7 @@ export default function AdminDashboard() {
           { label: "Expenses", value: expenses.length, icon: Receipt, color: "bg-orange-50 text-orange-700", href: "/admin/expenses" },
           { label: "Total Tours", value: tours.length, icon: Map, color: "bg-green-50 text-green-700", href: "/admin/tours" },
           { label: "Active Tours", value: activeTours, icon: Map, color: "bg-teal-50 text-teal-700", href: "/admin/tours" },
-          { label: "Total Staff", value: staff.length, icon: Users, color: "bg-indigo-50 text-indigo-700", href: "/admin/hr/staff" },
+          { label: "Follow-ups Due", value: followUpsDue.length, icon: Bell, color: followUpsDue.length > 0 ? "bg-amber-50 text-amber-700" : "bg-gray-50 text-gray-400", href: "/admin/leads" },
           { label: "Pending Leave", value: pendingLeave, icon: CalendarDays, color: "bg-amber-50 text-amber-700", href: "/admin/hr/leave" },
         ].map((s) => (
           <Link key={s.label} href={s.href} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col gap-2 hover:shadow-md transition-shadow lg:col-span-1 col-span-1">
@@ -170,19 +213,19 @@ export default function AdminDashboard() {
           ) : (
             <div className="divide-y divide-gray-50">
               {recentSales.map((s) => (
-                <div key={s.id} className="flex items-center gap-3 px-5 py-3.5">
+                <Link key={s.id} href={`/admin/sales/${s.id}`} className="flex items-center gap-3 px-5 py-3.5 hover:bg-gray-50 transition-colors">
                   <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                     <span className="text-blue-700 font-bold text-sm">{s.clientName.charAt(0)}</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-800 truncate">{s.clientName}</p>
-                    <p className="text-xs text-gray-400 truncate">{s.tourTitle} · {s.pax} pax</p>
+                    <p className="text-xs text-gray-400 truncate">{s.bookingRef} · {s.tourTitle}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
                     <div className="text-xs font-semibold text-gray-800">USD {s.amountUsd.toLocaleString()}</div>
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${PAY_COLOR[s.paymentStatus] ?? "bg-gray-100 text-gray-500"}`}>{s.paymentStatus}</span>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}
@@ -199,7 +242,7 @@ export default function AdminDashboard() {
           ) : (
             <div className="divide-y divide-gray-50">
               {hotLeads.map((l) => (
-                <Link key={l.id} href={`/admin/leads/${l.id}`} className="flex items-center gap-3 px-5 py-3.5 hover:bg-gray-50 transition-colors block">
+                <Link key={l.id} href={`/admin/leads/${l.id}`} className="flex items-center gap-3 px-5 py-3.5 hover:bg-gray-50 transition-colors">
                   <div className="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
                     <span className="text-purple-700 font-bold text-sm">{l.name.charAt(0)}</span>
                   </div>
@@ -207,7 +250,12 @@ export default function AdminDashboard() {
                     <p className="text-sm font-medium text-gray-800 truncate">{l.name}</p>
                     <p className="text-xs text-gray-400 truncate">{l.destination} · {l.travelers}</p>
                   </div>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${STATUS_COLOR[l.status]}`}>{l.status}</span>
+                  <div className="text-right flex-shrink-0">
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLOR[l.status]}`}>{l.status}</span>
+                    {l.nextFollowUp && l.nextFollowUp <= today && (
+                      <div className="text-xs text-amber-600 mt-0.5">Follow up!</div>
+                    )}
+                  </div>
                 </Link>
               ))}
             </div>
