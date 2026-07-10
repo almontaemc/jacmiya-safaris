@@ -42,7 +42,7 @@ export default function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-sand shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-28">
+        <div className="flex items-center justify-between h-36">
 
           {/* Brand */}
           <Link href="/" className="flex items-center flex-shrink-0">
@@ -50,7 +50,7 @@ export default function Navbar() {
             <img
               src="/logo.png"
               alt="Jacmiya Safaris & Holiday Tours"
-              className="h-24 w-auto"
+              className="h-32 w-auto"
             />
           </Link>
 

@@ -19,6 +19,10 @@ export const metadata: Metadata = {
   title: "Jacmiya Safaris & Holiday Tours | East Africa's Premier Safari Operator",
   description:
     "Discover Africa's wild heart with Jacmiya Safaris. Expert-guided wildlife adventures across Kenya, Tanzania, and Rwanda. 70+ destinations, price-match guarantee.",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
