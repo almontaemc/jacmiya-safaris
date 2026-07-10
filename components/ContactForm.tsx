@@ -15,6 +15,7 @@ export default function ContactForm() {
 function ContactFormInner() {
   const searchParams = useSearchParams();
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -32,9 +33,11 @@ function ContactFormInner() {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // Auto-save as a lead
+    setSending(true);
+
+    // 1. Save as lead in localStorage (always works, no network needed)
     addLead({
       name: formData.name,
       email: formData.email,
@@ -49,6 +52,29 @@ function ContactFormInner() {
       status: "New",
       followUps: [],
     });
+
+    // 2. Send email notification (best-effort — don't block success on failure)
+    try {
+      await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          destination: formData.destination,
+          travelers: formData.travelers,
+          dates: formData.dates,
+          budget: formData.budget,
+          message: formData.message,
+          tourInterest: tourParam || "Custom Safari",
+        }),
+      });
+    } catch {
+      // Silent fail — lead is already saved, email is best-effort
+    }
+
+    setSending(false);
     setSubmitted(true);
   }
 
@@ -144,8 +170,8 @@ function ContactFormInner() {
         <textarea name="message" rows={4} value={formData.message} onChange={handleChange} placeholder="E.g. We're celebrating our anniversary, love wildlife photography, interested in gorilla trekking…" className="w-full border border-sand rounded-xl px-4 py-3 text-sm text-bark placeholder-earth/60 focus:outline-none focus:border-savanna transition-colors resize-none" />
       </div>
 
-      <button type="submit" className="w-full bg-savanna hover:bg-savanna-dark text-white font-semibold py-3.5 rounded-full text-base transition-colors shadow-md shadow-savanna/20">
-        Send My Safari Request →
+      <button type="submit" disabled={sending} className="w-full bg-savanna hover:bg-savanna-dark text-white font-semibold py-3.5 rounded-full text-base transition-colors shadow-md shadow-savanna/20 disabled:opacity-70 disabled:cursor-not-allowed">
+        {sending ? "Sending…" : "Send My Safari Request →"}
       </button>
       <p className="text-earth text-xs text-center pt-1">We respond within 24 hours. No spam, no pressure — ever.</p>
     </form>

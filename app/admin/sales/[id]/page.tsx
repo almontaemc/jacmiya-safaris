@@ -4,7 +4,7 @@ import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { getSales, updateSale, getSettings } from "@/lib/adminStore";
 import type { Sale, PaymentStatus, AppSettings } from "@/types/admin";
-import { ArrowLeft, Printer, CheckCircle, Clock, AlertCircle, XCircle, RefreshCw } from "lucide-react";
+import { ArrowLeft, Printer, CheckCircle, Clock, AlertCircle, XCircle, RefreshCw, Mail } from "lucide-react";
 
 const PAYMENT_STATUSES: PaymentStatus[] = ["Pending Deposit", "Deposit Paid", "Fully Paid", "Refunded", "Cancelled"];
 const PAY_COLOR: Record<PaymentStatus, string> = {
@@ -30,6 +30,9 @@ export default function SaleDetail({ params }: { params: Promise<{ id: string }>
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [emailing, setEmailing] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [emailError, setEmailError] = useState("");
 
   function load() {
     const found = getSales().find((s) => s.id === id);
@@ -58,6 +61,47 @@ export default function SaleDetail({ params }: { params: Promise<{ id: string }>
     ? Math.max(0, Math.round((new Date(sale.travelTo).getTime() - new Date(sale.travelFrom).getTime()) / 86400000))
     : 0;
 
+  async function handleEmailClient() {
+    if (!sale) return;
+    setEmailing(true);
+    setEmailError("");
+    try {
+      const res = await fetch("/api/booking-confirmation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientName: sale.clientName,
+          clientEmail: sale.clientEmail,
+          clientPhone: sale.clientPhone,
+          bookingRef: sale.bookingRef,
+          tourTitle: sale.tourTitle,
+          travelFrom: sale.travelFrom,
+          travelTo: sale.travelTo,
+          pax: sale.pax,
+          amountKsh: sale.amountKsh,
+          amountUsd: sale.amountUsd,
+          depositKsh: sale.depositKsh,
+          depositUsd: sale.depositUsd,
+          paymentStatus: sale.paymentStatus,
+          notes: sale.notes,
+          companyName: companyName,
+          companyPhone: settings?.companyPhone ?? "+254 116 482 995",
+          companyEmail: settings?.companyEmail ?? "info@jacmiyasafaris.com",
+        }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setEmailSent(true);
+        setTimeout(() => setEmailSent(false), 5000);
+      } else {
+        setEmailError("Failed to send — check that RESEND_API_KEY is set in Vercel.");
+      }
+    } catch {
+      setEmailError("Network error sending email.");
+    }
+    setEmailing(false);
+  }
+
   function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -81,10 +125,20 @@ export default function SaleDetail({ params }: { params: Promise<{ id: string }>
           <h1 className="text-2xl font-bold text-gray-900">{sale.bookingRef}</h1>
           <p className="text-gray-500 text-sm">{sale.clientName} · {sale.tourTitle}</p>
         </div>
+        <button onClick={handleEmailClient} disabled={emailing}
+          className="flex items-center gap-2 border border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors disabled:opacity-60">
+          <Mail className="w-4 h-4" />
+          {emailing ? "Sending…" : emailSent ? "Sent ✓" : "Email Client"}
+        </button>
         <button onClick={() => window.print()} className="flex items-center gap-2 border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
           <Printer className="w-4 h-4" /> Print Confirmation
         </button>
       </div>
+      {emailError && (
+        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700 print:hidden">
+          {emailError}
+        </div>
+      )}
 
       {/* Print header */}
       <div className="hidden print:block mb-8 border-b border-gray-300 pb-6">
