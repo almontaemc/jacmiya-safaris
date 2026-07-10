@@ -16,7 +16,7 @@ const values = [
 ];
 
 const milestones = [
-  { year: "2014", event: "Founded in Nairobi with a single vehicle and a big dream." },
+  { year: "2021", event: "Founded in Nairobi with a single vehicle and a big dream." },
   { year: "2016", event: "Expanded to Tanzania — first Serengeti migration tour sold out in days." },
   { year: "2019", event: "Launched Rwanda gorilla trekking packages after years of local partnership." },
   { year: "2022", event: "Crossed 500 happy travelers milestone and launched our price-match guarantee." },
@@ -51,7 +51,7 @@ export default function About() {
             <span className="text-savanna text-sm font-semibold uppercase tracking-widest">Who We Are</span>
             <h2 className="font-serif text-3xl sm:text-4xl font-bold text-bark mt-2 mb-6 leading-tight">Born From a Love of the Wild</h2>
             <div className="space-y-4 text-earth leading-relaxed">
-              <p>Jacmiya Safaris was founded in 2014 in Nairobi with the belief that every traveler deserves a deeply personal, expertly guided encounter with East Africa&apos;s natural world.</p>
+              <p>Jacmiya Safaris was founded in 2021 in Nairobi with the belief that every traveler deserves a deeply personal, expertly guided encounter with East Africa&apos;s natural world.</p>
               <p>What began as one vehicle and a notebook full of dream itineraries has grown into one of Kenya&apos;s most trusted safari operators — with a portfolio spanning 70+ destinations across Kenya, Tanzania, and Rwanda.</p>
               <p>We combine deep local knowledge with world-class hospitality. Every guide on our team is a trained naturalist and a genuine storyteller. We don&apos;t just show you the Big Five — we help you understand the ecosystems, the communities, and the conservation battles that shape the Africa you&apos;re visiting.</p>
             </div>
@@ -64,7 +64,7 @@ export default function About() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/tanzania-sm.jpg" alt="Safari landscape" className="rounded-2xl w-full h-96 object-cover shadow-xl" />
             <div className="absolute -bottom-6 -left-6 bg-forest rounded-2xl p-5 shadow-xl hidden sm:block">
-              <div className="text-savanna text-3xl font-bold">10+</div>
+              <div className="text-savanna text-3xl font-bold">5+</div>
               <div className="text-cream text-sm mt-0.5">Years in Business</div>
             </div>
           </div>
@@ -75,7 +75,7 @@ export default function About() {
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-14">
             <span className="text-savanna text-sm font-semibold uppercase tracking-widest">Our Journey</span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-cream mt-2">A Decade in the Making</h2>
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-cream mt-2">Our Journey So Far</h2>
           </div>
           <div className="relative">
             <div className="absolute left-6 top-0 bottom-0 w-px bg-white/20" />
