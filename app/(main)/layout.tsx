@@ -6,7 +6,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   return (
     <CurrencyProvider>
       <Navbar />
-      <main className="flex-1 pt-48">{children}</main>
+      <main className="flex-1 pt-36">{children}</main>
       <Footer />
     </CurrencyProvider>
   );
