@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const NOTIFY_TO = "info@jacmiyasafaris.com";
+const NOTIFY_TO = "techyhomesolutions@gmail.com";
 const FROM = "Jacmiya Safaris <info@jacmiyasafaris.com>";
 
 async function sendEmail(payload: {
