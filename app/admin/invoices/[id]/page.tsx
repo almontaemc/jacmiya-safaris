@@ -94,14 +94,21 @@ export default function InvoiceDetail({ params }: { params: Promise<{ id: string
       {/* ─── PRINTABLE INVOICE ─────────────────────────────────────── */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden" id="invoice-document">
         <div className="bg-[#3d5a3e] text-white px-8 py-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-2xl font-bold">{companyName}</h1>
-              <p className="text-white/70 text-sm mt-0.5">{companyAddress}</p>
-              <p className="text-white/70 text-sm">{companyEmail} · {companyPhone}</p>
-              <p className="text-white/60 text-xs mt-0.5">{companyWebsite}</p>
+          <div className="flex items-start justify-between gap-6">
+            <div className="flex items-start gap-4">
+              <div className="bg-white rounded-xl p-2 flex-shrink-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo.png" alt="Jacmiya Safaris" className="h-14 w-auto" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold">{companyName}</h1>
+                <p className="text-white/70 text-sm mt-0.5">{companyAddress}</p>
+                <p className="text-white/70 text-sm">{companyEmail} · {companyPhone}</p>
+                <p className="text-white/70 text-sm">Europe: rashmi@jacmiyasafaris.com · +41 76 686 11 93</p>
+                <p className="text-white/60 text-xs mt-0.5">{companyWebsite}</p>
+              </div>
             </div>
-            <div className="text-right">
+            <div className="text-right flex-shrink-0">
               <div className="text-xs text-white/60 uppercase tracking-widest font-semibold">Invoice</div>
               <div className="text-xl font-bold mt-1">{invoice.invoiceNumber}</div>
               <div className="text-sm text-white/70 mt-1">Issued: {formatDate(invoice.issueDate)}</div>
