@@ -3,7 +3,7 @@ import type {
   AdminTour, StaffMember, LeaveRequest,
   Lead, FollowUp, Sale, Expense,
   PayrollRun, PayrollEntry,
-  Review, AppSettings,
+  Review, AppSettings, Invoice, InvoiceStatus,
 } from "@/types/admin";
 
 const ADMIN_PASSWORD_KEY = "jm_admin_pwd";
@@ -19,6 +19,8 @@ const PAYROLL_KEY = "jm_payroll";
 const REVIEWS_KEY = "jm_reviews";
 const SETTINGS_KEY = "jm_settings";
 const BOOKING_SEQ_KEY = "jm_booking_seq";
+const INVOICES_KEY = "jm_invoices";
+const INVOICE_SEQ_KEY = "jm_invoice_seq";
 const DEFAULT_RATE = 129;
 
 // ─── Initial data ─────────────────────────────────────────────────────────────
@@ -161,7 +163,7 @@ export function generateBookingRef(): string {
 
 // ─── Backup & Restore ─────────────────────────────────────────────────────────
 
-const ALL_KEYS = [TOURS_KEY, STAFF_KEY, LEAVE_KEY, RATE_KEY, LEADS_KEY, SALES_KEY, EXPENSES_KEY, PAYROLL_KEY, REVIEWS_KEY, SETTINGS_KEY, BOOKING_SEQ_KEY, ADMIN_PASSWORD_KEY];
+const ALL_KEYS = [TOURS_KEY, STAFF_KEY, LEAVE_KEY, RATE_KEY, LEADS_KEY, SALES_KEY, EXPENSES_KEY, PAYROLL_KEY, REVIEWS_KEY, SETTINGS_KEY, BOOKING_SEQ_KEY, ADMIN_PASSWORD_KEY, INVOICES_KEY, INVOICE_SEQ_KEY];
 
 export function exportAllData(): string {
   const data: Record<string, unknown> = { _exportedAt: new Date().toISOString(), _version: "1" };
@@ -367,6 +369,56 @@ export function updateSale(id: string, updates: Partial<Sale>): void {
 }
 
 export function deleteSale(id: string): void { saveSales(getSales().filter((s) => s.id !== id)); }
+
+// ─── Invoices ─────────────────────────────────────────────────────────────────
+
+export function generateInvoiceNumber(): string {
+  if (typeof window === "undefined") return "INV-XXXX-001";
+  const year = new Date().getFullYear();
+  const seq = Number(localStorage.getItem(INVOICE_SEQ_KEY) ?? "0") + 1;
+  localStorage.setItem(INVOICE_SEQ_KEY, String(seq));
+  return `INV-${year}-${String(seq).padStart(3, "0")}`;
+}
+
+export function getInvoices(): Invoice[] {
+  if (typeof window === "undefined") return [];
+  const raw = localStorage.getItem(INVOICES_KEY);
+  if (raw) return JSON.parse(raw) as Invoice[];
+  localStorage.setItem(INVOICES_KEY, JSON.stringify([]));
+  return [];
+}
+
+export function saveInvoices(invoices: Invoice[]): void { localStorage.setItem(INVOICES_KEY, JSON.stringify(invoices)); }
+
+export function addInvoice(invoice: Omit<Invoice, "id" | "invoiceNumber" | "createdAt" | "updatedAt">): Invoice {
+  const newInvoice: Invoice = {
+    ...invoice,
+    id: `inv_${Date.now()}`,
+    invoiceNumber: generateInvoiceNumber(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  saveInvoices([...getInvoices(), newInvoice]);
+  return newInvoice;
+}
+
+export function updateInvoice(id: string, updates: Partial<Invoice>): void {
+  const invoices = getInvoices();
+  const idx = invoices.findIndex((i) => i.id === id);
+  if (idx !== -1) { invoices[idx] = { ...invoices[idx], ...updates, updatedAt: new Date().toISOString() }; saveInvoices(invoices); }
+}
+
+export function deleteInvoice(id: string): void { saveInvoices(getInvoices().filter((i) => i.id !== id)); }
+
+// An invoice is only ever stored as Unpaid/Paid/Cancelled — "Overdue" is derived
+// from today's date vs. dueDate so it never goes stale in storage.
+export function getInvoiceDisplayStatus(invoice: Invoice): InvoiceStatus | "Overdue" {
+  if (invoice.status === "Unpaid" && invoice.dueDate) {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    if (new Date(invoice.dueDate) < today) return "Overdue";
+  }
+  return invoice.status;
+}
 
 // ─── Expenses ─────────────────────────────────────────────────────────────────
 

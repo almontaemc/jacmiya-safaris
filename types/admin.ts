@@ -129,6 +129,36 @@ export interface Sale {
   updatedAt: string;
 }
 
+// ─── Invoices ─────────────────────────────────────────────────────────────────
+
+export type InvoiceStatus = "Unpaid" | "Paid" | "Cancelled";
+
+export interface InvoiceItem {
+  id: string;
+  description: string;
+  quantity: number;
+  unitPriceKsh: number;
+  unitPriceUsd: number;
+}
+
+export interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  saleId?: string;
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  issueDate: string;
+  dueDate: string;
+  items: InvoiceItem[];
+  amountKsh: number;
+  amountUsd: number;
+  status: InvoiceStatus;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ─── Expenses ─────────────────────────────────────────────────────────────────
 
 export type ExpenseCategory =

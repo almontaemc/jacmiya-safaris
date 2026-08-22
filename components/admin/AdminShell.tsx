@@ -7,7 +7,7 @@ import { isAuthenticated, logout } from "@/lib/adminStore";
 import {
   LayoutDashboard, Map, Users, CalendarDays, LogOut,
   Menu, ChevronDown, ChevronRight, Target, DollarSign, Receipt,
-  BarChart2, Star, Settings, Search, X,
+  BarChart2, Star, Settings, Search, X, FileText,
 } from "lucide-react";
 
 const NAV = [
@@ -31,6 +31,13 @@ const NAV = [
     children: [
       { label: "All Bookings", href: "/admin/sales" },
       { label: "Add Booking", href: "/admin/sales/new" },
+    ],
+  },
+  {
+    label: "Invoices", icon: FileText,
+    children: [
+      { label: "All Invoices", href: "/admin/invoices" },
+      { label: "New Invoice", href: "/admin/invoices/new" },
     ],
   },
   {
@@ -75,7 +82,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [expanded, setExpanded] = useState<string[]>(["Tours", "Leads", "Sales", "Expenses", "Reports", "Reviews", "Human Resources"]);
+  const [expanded, setExpanded] = useState<string[]>(["Tours", "Leads", "Sales", "Invoices", "Expenses", "Reports", "Reviews", "Human Resources"]);
   const [searchQuery, setSearchQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
 

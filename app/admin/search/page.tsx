@@ -3,9 +3,9 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { getLeads, getSales, getStaff, getExpenses, getTours } from "@/lib/adminStore";
-import type { Lead, Sale, StaffMember, Expense, AdminTour } from "@/types/admin";
-import { Target, DollarSign, Users, Receipt, Map, Search } from "lucide-react";
+import { getLeads, getSales, getStaff, getExpenses, getTours, getInvoices } from "@/lib/adminStore";
+import type { Lead, Sale, StaffMember, Expense, AdminTour, Invoice } from "@/types/admin";
+import { Target, DollarSign, Users, Receipt, Map, Search, FileText } from "lucide-react";
 
 function highlight(text: string, query: string) {
   if (!query) return text;
@@ -23,6 +23,7 @@ function highlight(text: string, query: string) {
 interface SearchResults {
   leads: Lead[];
   sales: Sale[];
+  invoices: Invoice[];
   staff: StaffMember[];
   expenses: Expense[];
   tours: AdminTour[];
@@ -31,7 +32,7 @@ interface SearchResults {
 function SearchInner() {
   const searchParams = useSearchParams();
   const q = searchParams.get("q") ?? "";
-  const [results, setResults] = useState<SearchResults>({ leads: [], sales: [], staff: [], expenses: [], tours: [] });
+  const [results, setResults] = useState<SearchResults>({ leads: [], sales: [], invoices: [], staff: [], expenses: [], tours: [] });
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -48,6 +49,9 @@ function SearchInner() {
       sales: getSales().filter((s) =>
         [s.clientName, s.clientEmail, s.clientPhone, s.tourTitle, s.bookingRef, s.notes].some((v) => v?.toLowerCase().includes(ql))
       ),
+      invoices: getInvoices().filter((i) =>
+        [i.clientName, i.clientEmail, i.clientPhone, i.invoiceNumber, i.notes].some((v) => v?.toLowerCase().includes(ql))
+      ),
       staff: getStaff().filter((s) =>
         [s.name, s.email, s.role, s.department].some((v) => v?.toLowerCase().includes(ql))
       ),
@@ -60,7 +64,7 @@ function SearchInner() {
     });
   }, [q, mounted]);
 
-  const total = results.leads.length + results.sales.length + results.staff.length + results.expenses.length + results.tours.length;
+  const total = results.leads.length + results.sales.length + results.invoices.length + results.staff.length + results.expenses.length + results.tours.length;
 
   if (!q) {
     return (
@@ -119,6 +123,24 @@ function SearchInner() {
                 <div className="text-xs text-gray-400">{highlight(s.bookingRef, q)} · {highlight(s.tourTitle, q)}</div>
               </div>
               <span className="text-xs text-gray-400 flex-shrink-0">{s.paymentStatus}</span>
+            </Link>
+          ))}
+        </Section>
+      )}
+
+      {/* Invoices */}
+      {results.invoices.length > 0 && (
+        <Section title="Invoices" icon={FileText} count={results.invoices.length} iconColor="text-cyan-600 bg-cyan-50">
+          {results.invoices.map((i) => (
+            <Link key={i.id} href={`/admin/invoices/${i.id}`} className="flex items-center gap-3 px-5 py-3.5 hover:bg-gray-50 transition-colors">
+              <div className="w-8 h-8 rounded-full bg-cyan-100 flex items-center justify-center flex-shrink-0">
+                <span className="text-cyan-700 font-bold text-xs">{i.clientName.charAt(0)}</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium text-gray-800">{highlight(i.clientName, q)}</div>
+                <div className="text-xs text-gray-400">{highlight(i.invoiceNumber, q)} · {highlight(i.clientEmail, q)}</div>
+              </div>
+              <span className="text-xs text-gray-400 flex-shrink-0">{i.status}</span>
             </Link>
           ))}
         </Section>
