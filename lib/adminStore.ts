@@ -78,7 +78,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   companyEmail: "info@jacmiyasafaris.com",
   companyPhone: "+254 716 482 995",
   companyAddress: "Nairobi, Kenya",
-  companyWebsite: "https://jacmiya-safaris.vercel.app",
+  companyWebsite: "https://www.jacmiyasafaris.com",
   tagline: "Discover the Wild Heart of Africa",
 };
 

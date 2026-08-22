@@ -55,7 +55,7 @@ export default function InvoiceDetail({ params }: { params: Promise<{ id: string
   const companyEmail = settings?.companyEmail ?? "info@jacmiyasafaris.com";
   const companyPhone = settings?.companyPhone ?? "+254 716 482 995";
   const companyAddress = settings?.companyAddress ?? "Nairobi, Kenya";
-  const companyWebsite = settings?.companyWebsite ?? "https://jacmiya-safaris.vercel.app";
+  const companyWebsite = settings?.companyWebsite ?? "https://www.jacmiyasafaris.com";
 
   const displayStatus = getInvoiceDisplayStatus(invoice);
   const StatusIcon = STATUS_ICON[displayStatus];

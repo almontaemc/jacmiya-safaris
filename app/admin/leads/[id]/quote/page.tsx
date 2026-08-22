@@ -44,7 +44,7 @@ export default function QuotePage({ params }: { params: Promise<{ id: string }> 
   const companyEmail = settings?.companyEmail ?? "info@jacmiyasafaris.com";
   const companyPhone = settings?.companyPhone ?? "+254 716 482 995";
   const companyAddress = settings?.companyAddress ?? "Nairobi, Kenya";
-  const companyWebsite = settings?.companyWebsite ?? "https://jacmiya-safaris.vercel.app";
+  const companyWebsite = settings?.companyWebsite ?? "https://www.jacmiyasafaris.com";
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
