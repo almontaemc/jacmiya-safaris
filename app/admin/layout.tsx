@@ -3,7 +3,7 @@ import AdminShell from "@/components/admin/AdminShell";
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <style>{`
+      <style id="admin-print-style">{`
         @media print {
           @page { size: A4 landscape; margin: 1.2cm; }
           /* Hide sidebar, header, controls */

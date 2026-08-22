@@ -49,6 +49,31 @@ export default function InvoiceDetail({ params }: { params: Promise<{ id: string
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  // Invoices are a single-page document, so print them portrait A4 instead of the
+  // landscape A4 the admin layout uses for wide report tables. A second @page rule
+  // doesn't reliably win the print cascade in Chromium, so swap the shared rule's
+  // text directly for as long as this page is mounted, and restore it on unmount.
+  useEffect(() => {
+    const styleEl = document.getElementById("admin-print-style") as HTMLStyleElement | null;
+    const sheet = styleEl?.sheet;
+    if (!sheet) return;
+    const mediaRule = Array.from(sheet.cssRules).find(
+      (r): r is CSSMediaRule => r instanceof CSSMediaRule && r.media.mediaText.includes("print")
+    );
+    if (!mediaRule) return;
+    const pageIdx = Array.from(mediaRule.cssRules).findIndex((r) => r instanceof CSSPageRule);
+    if (pageIdx === -1) return;
+    const original = mediaRule.cssRules[pageIdx].cssText;
+    mediaRule.deleteRule(pageIdx);
+    mediaRule.insertRule("@page { size: A4 portrait; margin: 1.2cm; }", pageIdx);
+    return () => {
+      try {
+        mediaRule.deleteRule(pageIdx);
+        mediaRule.insertRule(original, pageIdx);
+      } catch { /* style tag already gone */ }
+    };
+  }, []);
+
   if (!invoice) return <div className="p-6 text-gray-400">Invoice not found.</div>;
 
   const companyName = settings?.companyName ?? "Jacmiya Safaris";
