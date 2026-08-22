@@ -19,7 +19,7 @@ export default function SettingsPage() {
   // General
   const [settings, setSettings] = useState<AppSettings>({
     companyName: "", companyEmail: "", companyPhone: "",
-    companyAddress: "", companyWebsite: "", tagline: "",
+    companyAddress: "", companyWebsite: "", tagline: "", bankDetails: "",
   });
 
   // Security
@@ -155,6 +155,13 @@ export default function SettingsPage() {
               <label className={labelCls}>Website</label>
               <input value={settings.companyWebsite} onChange={(e) => setSettings({ ...settings, companyWebsite: e.target.value })} className={inputCls} placeholder="https://jacmiyasafaris.com" />
             </div>
+          </div>
+          <div>
+            <label className={labelCls}>Bank Details</label>
+            <textarea rows={4} value={settings.bankDetails} onChange={(e) => setSettings({ ...settings, bankDetails: e.target.value })}
+              className={`${inputCls} resize-none`}
+              placeholder={"Bank Name: ...\nAccount Name: ...\nAccount Number: ...\nSWIFT/BIC: ..."} />
+            <p className="text-xs text-gray-400 mt-1">Shown under &ldquo;Bank Details&rdquo; on the printable invoice. Leave blank to hide the section.</p>
           </div>
           <div className="flex items-center gap-3 pt-2">
             <button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-colors">Save Changes</button>

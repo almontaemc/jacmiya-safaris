@@ -195,6 +195,13 @@ export default function InvoiceDetail({ params }: { params: Promise<{ id: string
             </div>
           )}
 
+          {settings?.bankDetails && (
+            <div>
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Bank Details</div>
+              <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 whitespace-pre-line">{settings.bankDetails}</div>
+            </div>
+          )}
+
           <div className="border-t border-gray-200 pt-5 text-center text-xs text-gray-400">
             <p>Thank you for choosing {companyName}.</p>
             <p className="mt-0.5">Payment queries: <strong className="text-gray-600">{companyEmail}</strong> · <strong className="text-gray-600">{companyPhone}</strong></p>

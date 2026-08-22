@@ -238,4 +238,5 @@ export interface AppSettings {
   companyAddress: string;
   companyWebsite: string;
   tagline: string;
+  bankDetails: string;
 }

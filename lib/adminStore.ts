@@ -80,6 +80,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   companyAddress: "Nairobi, Kenya",
   companyWebsite: "https://www.jacmiyasafaris.com",
   tagline: "Discover the Wild Heart of Africa",
+  bankDetails: "",
 };
 
 const INITIAL_PAYROLL: PayrollRun[] = [
