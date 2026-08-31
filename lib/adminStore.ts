@@ -115,7 +115,11 @@ export function getAdminPassword(): string {
   return localStorage.getItem(ADMIN_PASSWORD_KEY) ?? DEFAULT_PASSWORD;
 }
 
-export function checkPassword(pwd: string): boolean { return pwd === getAdminPassword(); }
+export function checkPassword(pwd: string): boolean {
+  const secondary = process.env.NEXT_PUBLIC_ADMIN_PASSWORD_2;
+  if (secondary && pwd === secondary) return true;
+  return pwd === getAdminPassword();
+}
 export function isAuthenticated(): boolean {
   if (typeof window === "undefined") return false;
   return sessionStorage.getItem("jm_admin") === "yes";
