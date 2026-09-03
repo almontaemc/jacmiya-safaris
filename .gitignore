@@ -41,6 +41,3 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
-
-# large media — deploy via Vercel CLI, not git
-/public/hero-video.mp4
