@@ -113,14 +113,8 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-cream/30">
+        <div className="border-t border-white/10 mt-12 pt-6 flex items-center justify-center text-xs text-cream/30">
           <span>© 2026 Jacmiya Safaris & Holiday Tours. All rights reserved.</span>
-          <span>
-            Crafted by{" "}
-            <a href="https://techyhomesolutions.com" className="hover:text-savanna transition-colors">
-              Techy Home Solutions
-            </a>
-          </span>
         </div>
       </div>
     </footer>
