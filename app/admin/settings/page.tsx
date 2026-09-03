@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import {
   getSettings, saveSettings, getExchangeRate, setExchangeRate,
-  getAdminPassword, changeAdminPassword, exportAllData, importAllData,
+  verifyCurrentPassword, changeMyPassword, exportAllData, importAllData,
 } from "@/lib/adminStore";
 import type { AppSettings } from "@/types/admin";
 import { Building2, Lock, RefreshCw, Database, CheckCircle, AlertCircle, Download, Upload } from "lucide-react";
@@ -56,10 +56,10 @@ export default function SettingsPage() {
   function handleChangePassword(e: React.FormEvent) {
     e.preventDefault();
     setPwdError("");
-    if (currentPwd !== getAdminPassword()) { setPwdError("Current password is incorrect."); return; }
+    if (!verifyCurrentPassword(currentPwd)) { setPwdError("Current password is incorrect."); return; }
     if (newPwd.length < 8) { setPwdError("New password must be at least 8 characters."); return; }
     if (newPwd !== confirmPwd) { setPwdError("Passwords do not match."); return; }
-    changeAdminPassword(newPwd);
+    changeMyPassword(newPwd);
     setCurrentPwd(""); setNewPwd(""); setConfirmPwd("");
     setPwdSuccess(true);
     setTimeout(() => setPwdSuccess(false), 3000);

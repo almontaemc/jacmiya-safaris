@@ -229,6 +229,21 @@ export interface Review {
   createdAt: string;
 }
 
+// ─── Admin Users / Roles ──────────────────────────────────────────────────────
+
+export type UserRole = "Owner" | "Admin" | "Manager" | "Staff";
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+  role: UserRole;
+  active: boolean;
+  createdAt: string;
+  lastLogin?: string;
+}
+
 // ─── App Settings ─────────────────────────────────────────────────────────────
 
 export interface AppSettings {

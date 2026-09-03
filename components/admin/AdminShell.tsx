@@ -3,11 +3,11 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { isAuthenticated, logout } from "@/lib/adminStore";
+import { isAuthenticated, logout, getCurrentUser } from "@/lib/adminStore";
 import {
   LayoutDashboard, Map, Users, CalendarDays, LogOut,
   Menu, ChevronDown, ChevronRight, Target, DollarSign, Receipt,
-  BarChart2, Star, Settings, Search, X, FileText,
+  BarChart2, Star, Settings, Search, X, FileText, UserCog,
 } from "lucide-react";
 
 const NAV = [
@@ -74,6 +74,13 @@ const NAV = [
       { label: "Payroll", href: "/admin/hr/payroll" },
     ],
   },
+  {
+    label: "Users", icon: UserCog,
+    children: [
+      { label: "All Users", href: "/admin/users" },
+      { label: "Add User", href: "/admin/users/new" },
+    ],
+  },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
@@ -82,9 +89,10 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [expanded, setExpanded] = useState<string[]>(["Tours", "Leads", "Sales", "Invoices", "Expenses", "Reports", "Reviews", "Human Resources"]);
+  const [expanded, setExpanded] = useState<string[]>(["Tours", "Leads", "Sales", "Invoices", "Expenses", "Reports", "Reviews", "Human Resources", "Users"]);
   const [searchQuery, setSearchQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
+  const currentUser = getCurrentUser();
 
   useEffect(() => {
     setMounted(true);
@@ -169,8 +177,9 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
       <div className="px-3 py-4 border-t border-white/10">
         <div className="px-3 py-2 mb-1">
-          <p className="text-white/80 text-sm font-medium">Jacmiya Admin</p>
-          <p className="text-white/30 text-xs">jacmiya@jacmiyasafaris.com</p>
+          <p className="text-white/80 text-sm font-medium">{currentUser?.name ?? "Jacmiya Admin"}</p>
+          <p className="text-white/30 text-xs">{currentUser?.email ?? "jacmiya@jacmiyasafaris.com"}</p>
+          {currentUser && <p className="text-white/20 text-[10px] uppercase tracking-wider mt-0.5">{currentUser.role}</p>}
         </div>
         <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/50 hover:text-red-400 hover:bg-white/5 transition-colors">
           <LogOut className="w-4 h-4" />

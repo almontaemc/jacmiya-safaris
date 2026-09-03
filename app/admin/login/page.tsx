@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { checkPassword, login } from "@/lib/adminStore";
+import { loginWithPassword } from "@/lib/adminStore";
 import { Eye, EyeOff, Lock } from "lucide-react";
 
 export default function AdminLogin() {
@@ -17,8 +17,7 @@ export default function AdminLogin() {
     setLoading(true);
     setError("");
     setTimeout(() => {
-      if (checkPassword(password)) {
-        login();
+      if (loginWithPassword(password)) {
         router.replace("/admin");
       } else {
         setError("Incorrect password. Please try again.");

@@ -4,6 +4,7 @@ import type {
   Lead, FollowUp, Sale, Expense,
   PayrollRun, PayrollEntry,
   Review, AppSettings, Invoice, InvoiceStatus,
+  AdminUser,
 } from "@/types/admin";
 
 const ADMIN_PASSWORD_KEY = "jm_admin_pwd";
@@ -21,6 +22,8 @@ const SETTINGS_KEY = "jm_settings";
 const BOOKING_SEQ_KEY = "jm_booking_seq";
 const INVOICES_KEY = "jm_invoices";
 const INVOICE_SEQ_KEY = "jm_invoice_seq";
+const USERS_KEY = "jm_users";
+const CURRENT_USER_KEY = "jm_admin_user";
 const DEFAULT_RATE = 129;
 
 // ─── Initial data ─────────────────────────────────────────────────────────────
@@ -108,27 +111,114 @@ const INITIAL_PAYROLL: PayrollRun[] = [
   },
 ];
 
-// ─── Auth ────────────────────────────────────────────────────────────────────
+// ─── Auth (legacy shared password) ───────────────────────────────────────────
 
 export function getAdminPassword(): string {
   if (typeof window === "undefined") return DEFAULT_PASSWORD;
   return localStorage.getItem(ADMIN_PASSWORD_KEY) ?? DEFAULT_PASSWORD;
 }
 
+export function changeAdminPassword(newPwd: string): void {
+  localStorage.setItem(ADMIN_PASSWORD_KEY, newPwd);
+}
+
+// True if `pwd` matches the shared fallback password or the optional
+// NEXT_PUBLIC_ADMIN_PASSWORD_2 env var — used for logins/passwords that
+// predate (or fall outside) the named Users list below.
 export function checkPassword(pwd: string): boolean {
   const secondary = process.env.NEXT_PUBLIC_ADMIN_PASSWORD_2;
   if (secondary && pwd === secondary) return true;
   return pwd === getAdminPassword();
 }
+
+// ─── Users & Roles ────────────────────────────────────────────────────────────
+
+export function getUsers(): AdminUser[] {
+  if (typeof window === "undefined") return [];
+  const raw = localStorage.getItem(USERS_KEY);
+  if (raw) return JSON.parse(raw) as AdminUser[];
+  // First run: seed the Owner account. If this browser previously changed the
+  // shared password via Settings > Security, carry that over so nobody is
+  // locked out by the migration to named accounts.
+  const initial: AdminUser[] = [{
+    id: "u1",
+    name: "Jacmiya Admin",
+    email: "jacmiya@jacmiyasafaris.com",
+    password: getAdminPassword(),
+    role: "Owner",
+    active: true,
+    createdAt: "2026-01-01T00:00:00.000Z",
+  }];
+  localStorage.setItem(USERS_KEY, JSON.stringify(initial));
+  return initial;
+}
+
+export function saveUsers(users: AdminUser[]): void { localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
+
+export function addUser(user: Omit<AdminUser, "id" | "createdAt">): AdminUser {
+  const newUser: AdminUser = { ...user, id: `u_${Date.now()}`, createdAt: new Date().toISOString() };
+  saveUsers([...getUsers(), newUser]);
+  return newUser;
+}
+
+export function updateUser(id: string, updates: Partial<AdminUser>): void {
+  const users = getUsers();
+  const idx = users.findIndex((u) => u.id === id);
+  if (idx !== -1) { users[idx] = { ...users[idx], ...updates }; saveUsers(users); }
+}
+
+export function deleteUser(id: string): void { saveUsers(getUsers().filter((u) => u.id !== id)); }
+
+// ─── Session ──────────────────────────────────────────────────────────────────
+
+export interface CurrentUser { id: string; name: string; email: string; role: AdminUser["role"] }
+
+export function getCurrentUser(): CurrentUser | null {
+  if (typeof window === "undefined") return null;
+  const raw = sessionStorage.getItem(CURRENT_USER_KEY);
+  return raw ? (JSON.parse(raw) as CurrentUser) : null;
+}
+
 export function isAuthenticated(): boolean {
   if (typeof window === "undefined") return false;
   return sessionStorage.getItem("jm_admin") === "yes";
 }
-export function login(): void { sessionStorage.setItem("jm_admin", "yes"); }
-export function logout(): void { sessionStorage.removeItem("jm_admin"); }
 
-export function changeAdminPassword(newPwd: string): void {
-  localStorage.setItem(ADMIN_PASSWORD_KEY, newPwd);
+// Tries the named Users list first (so the sidebar/footer can show who's
+// actually logged in), then falls back to the shared password / env var.
+export function loginWithPassword(pwd: string): boolean {
+  const user = getUsers().find((u) => u.active && u.password === pwd);
+  if (user) {
+    sessionStorage.setItem("jm_admin", "yes");
+    sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify({ id: user.id, name: user.name, email: user.email, role: user.role }));
+    updateUser(user.id, { lastLogin: new Date().toISOString() });
+    return true;
+  }
+  if (checkPassword(pwd)) {
+    sessionStorage.setItem("jm_admin", "yes");
+    sessionStorage.removeItem(CURRENT_USER_KEY);
+    return true;
+  }
+  return false;
+}
+
+export function logout(): void {
+  sessionStorage.removeItem("jm_admin");
+  sessionStorage.removeItem(CURRENT_USER_KEY);
+}
+
+// For Settings > Security: verifies against whichever account is actually
+// signed in, falling back to the shared password for anonymous/legacy logins.
+export function verifyCurrentPassword(pwd: string): boolean {
+  const current = getCurrentUser();
+  if (current) return getUsers().find((u) => u.id === current.id)?.password === pwd;
+  return checkPassword(pwd);
+}
+
+export function changeMyPassword(newPwd: string): void {
+  const current = getCurrentUser();
+  if (current) updateUser(current.id, { password: newPwd });
+  else changeAdminPassword(newPwd);
 }
 
 // ─── Settings ─────────────────────────────────────────────────────────────────
@@ -168,7 +258,7 @@ export function generateBookingRef(): string {
 
 // ─── Backup & Restore ─────────────────────────────────────────────────────────
 
-const ALL_KEYS = [TOURS_KEY, STAFF_KEY, LEAVE_KEY, RATE_KEY, LEADS_KEY, SALES_KEY, EXPENSES_KEY, PAYROLL_KEY, REVIEWS_KEY, SETTINGS_KEY, BOOKING_SEQ_KEY, ADMIN_PASSWORD_KEY, INVOICES_KEY, INVOICE_SEQ_KEY];
+const ALL_KEYS = [TOURS_KEY, STAFF_KEY, LEAVE_KEY, RATE_KEY, LEADS_KEY, SALES_KEY, EXPENSES_KEY, PAYROLL_KEY, REVIEWS_KEY, SETTINGS_KEY, BOOKING_SEQ_KEY, ADMIN_PASSWORD_KEY, INVOICES_KEY, INVOICE_SEQ_KEY, USERS_KEY];
 
 export function exportAllData(): string {
   const data: Record<string, unknown> = { _exportedAt: new Date().toISOString(), _version: "1" };
