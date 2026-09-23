@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { getInvoices, deleteInvoice, getInvoiceDisplayStatus } from "@/lib/adminStore";
+import { getInvoices, deleteInvoice, getInvoiceDisplayStatus, getInvoiceBalance, getInvoicePaid } from "@/lib/adminStore";
 import type { Invoice, InvoiceStatus } from "@/types/admin";
 import { Plus, Trash2, FileText, AlertTriangle, TrendingUp } from "lucide-react";
 
@@ -29,7 +29,8 @@ export default function InvoicesPage() {
   const totalUsd = invoices.reduce((a, i) => a + i.amountUsd, 0);
   const totalKsh = invoices.reduce((a, i) => a + i.amountKsh, 0);
   const outstanding = withStatus.filter((x) => x.status === "Unpaid" || x.status === "Overdue");
-  const outstandingUsd = outstanding.reduce((a, x) => a + x.inv.amountUsd, 0);
+  const outstandingUsd = outstanding.reduce((a, x) => a + Math.max(getInvoiceBalance(x.inv).usd, 0), 0);
+  const collectedUsd = invoices.reduce((a, i) => a + getInvoicePaid(i.id).usd, 0);
   const overdueCount = withStatus.filter((x) => x.status === "Overdue").length;
 
   function handleDelete(id: string) {
@@ -66,7 +67,8 @@ export default function InvoicesPage() {
             <span className="text-sm font-medium text-gray-600">Outstanding</span>
           </div>
           <div className="text-xl font-bold text-gray-900">USD {outstandingUsd.toLocaleString()}</div>
-          <div className="text-xs text-gray-400 mt-1">{outstanding.length} unpaid invoice{outstanding.length !== 1 ? "s" : ""}</div>
+          <div className="text-sm text-gray-500 mt-0.5">USD {collectedUsd.toLocaleString()} received</div>
+          <div className="text-xs text-gray-400 mt-1">{outstanding.length} unpaid invoice{outstanding.length !== 1 ? "s" : ""}, net of part payments</div>
         </div>
         <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <div className="flex items-center gap-2 mb-3">
@@ -108,6 +110,11 @@ export default function InvoicesPage() {
               <div className="text-right flex-shrink-0">
                 <div className="text-sm font-bold text-gray-800">USD {inv.amountUsd.toLocaleString()}</div>
                 <div className="text-xs text-gray-500">KSH {inv.amountKsh.toLocaleString()}</div>
+                {(() => {
+                  const bal = getInvoiceBalance(inv).usd;
+                  if (bal <= 0 || bal >= inv.amountUsd) return null;
+                  return <div className="text-xs font-semibold text-red-500 mt-0.5">USD {bal.toLocaleString()} due</div>;
+                })()}
                 <div className="flex items-center gap-1 mt-2 justify-end">
                   <Link href={`/admin/invoices/${inv.id}`} className="text-xs font-semibold text-blue-600 hover:text-blue-700 px-2 py-1">View</Link>
                   <button onClick={() => handleDelete(inv.id)} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>

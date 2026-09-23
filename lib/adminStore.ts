@@ -4,7 +4,7 @@ import type {
   Lead, FollowUp, Sale, Expense,
   PayrollRun, PayrollEntry,
   Review, AppSettings, Invoice, InvoiceStatus,
-  AdminUser,
+  Receipt, AdminUser,
 } from "@/types/admin";
 
 const ADMIN_PASSWORD_KEY = "jm_admin_pwd";
@@ -22,6 +22,8 @@ const SETTINGS_KEY = "jm_settings";
 const BOOKING_SEQ_KEY = "jm_booking_seq";
 const INVOICES_KEY = "jm_invoices";
 const INVOICE_SEQ_KEY = "jm_invoice_seq";
+const RECEIPTS_KEY = "jm_receipts";
+const RECEIPT_SEQ_KEY = "jm_receipt_seq";
 const USERS_KEY = "jm_users";
 const CURRENT_USER_KEY = "jm_admin_user";
 const DEFAULT_RATE = 129;
@@ -258,7 +260,7 @@ export function generateBookingRef(): string {
 
 // ─── Backup & Restore ─────────────────────────────────────────────────────────
 
-const ALL_KEYS = [TOURS_KEY, STAFF_KEY, LEAVE_KEY, RATE_KEY, LEADS_KEY, SALES_KEY, EXPENSES_KEY, PAYROLL_KEY, REVIEWS_KEY, SETTINGS_KEY, BOOKING_SEQ_KEY, ADMIN_PASSWORD_KEY, INVOICES_KEY, INVOICE_SEQ_KEY, USERS_KEY];
+const ALL_KEYS = [TOURS_KEY, STAFF_KEY, LEAVE_KEY, RATE_KEY, LEADS_KEY, SALES_KEY, EXPENSES_KEY, PAYROLL_KEY, REVIEWS_KEY, SETTINGS_KEY, BOOKING_SEQ_KEY, ADMIN_PASSWORD_KEY, INVOICES_KEY, INVOICE_SEQ_KEY, RECEIPTS_KEY, RECEIPT_SEQ_KEY, USERS_KEY];
 
 export function exportAllData(): string {
   const data: Record<string, unknown> = { _exportedAt: new Date().toISOString(), _version: "1" };
@@ -513,6 +515,96 @@ export function getInvoiceDisplayStatus(invoice: Invoice): InvoiceStatus | "Over
     if (new Date(invoice.dueDate) < today) return "Overdue";
   }
   return invoice.status;
+}
+
+// ─── Receipts ─────────────────────────────────────────────────────────────────
+
+export function generateReceiptNumber(): string {
+  if (typeof window === "undefined") return "RCP-XXXX-001";
+  const year = new Date().getFullYear();
+  const seq = Number(localStorage.getItem(RECEIPT_SEQ_KEY) ?? "0") + 1;
+  localStorage.setItem(RECEIPT_SEQ_KEY, String(seq));
+  return `RCP-${year}-${String(seq).padStart(3, "0")}`;
+}
+
+export function getReceipts(): Receipt[] {
+  if (typeof window === "undefined") return [];
+  const raw = localStorage.getItem(RECEIPTS_KEY);
+  if (raw) return JSON.parse(raw) as Receipt[];
+  localStorage.setItem(RECEIPTS_KEY, JSON.stringify([]));
+  return [];
+}
+
+export function saveReceipts(receipts: Receipt[]): void { localStorage.setItem(RECEIPTS_KEY, JSON.stringify(receipts)); }
+
+export function addReceipt(receipt: Omit<Receipt, "id" | "receiptNumber" | "createdAt" | "updatedAt">): Receipt {
+  const newReceipt: Receipt = {
+    ...receipt,
+    id: `rcp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+    receiptNumber: generateReceiptNumber(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  saveReceipts([...getReceipts(), newReceipt]);
+  if (newReceipt.invoiceId) syncInvoicePaymentStatus(newReceipt.invoiceId);
+  return newReceipt;
+}
+
+export function updateReceipt(id: string, updates: Partial<Receipt>): void {
+  const receipts = getReceipts();
+  const idx = receipts.findIndex((r) => r.id === id);
+  if (idx === -1) return;
+  const previousInvoiceId = receipts[idx].invoiceId;
+  receipts[idx] = { ...receipts[idx], ...updates, updatedAt: new Date().toISOString() };
+  saveReceipts(receipts);
+  // Re-sync both sides when a receipt is moved between invoices.
+  if (previousInvoiceId) syncInvoicePaymentStatus(previousInvoiceId);
+  if (receipts[idx].invoiceId && receipts[idx].invoiceId !== previousInvoiceId) {
+    syncInvoicePaymentStatus(receipts[idx].invoiceId!);
+  }
+}
+
+export function deleteReceipt(id: string): void {
+  const receipt = getReceipts().find((r) => r.id === id);
+  saveReceipts(getReceipts().filter((r) => r.id !== id));
+  if (receipt?.invoiceId) syncInvoicePaymentStatus(receipt.invoiceId);
+}
+
+export function getReceiptsForInvoice(invoiceId: string): Receipt[] {
+  return getReceipts()
+    .filter((r) => r.invoiceId === invoiceId)
+    .sort((a, b) => new Date(a.paymentDate).getTime() - new Date(b.paymentDate).getTime());
+}
+
+/** Total received against an invoice, in both currencies. */
+export function getInvoicePaid(invoiceId: string): { ksh: number; usd: number } {
+  return getReceiptsForInvoice(invoiceId).reduce(
+    (acc, r) => ({ ksh: acc.ksh + r.amountKsh, usd: acc.usd + r.amountUsd }),
+    { ksh: 0, usd: 0 }
+  );
+}
+
+/** What's still owed on an invoice. Negative means the client overpaid. */
+export function getInvoiceBalance(invoice: Invoice): { ksh: number; usd: number } {
+  const paid = getInvoicePaid(invoice.id);
+  return { ksh: invoice.amountKsh - paid.ksh, usd: invoice.amountUsd - paid.usd };
+}
+
+/**
+ * Re-derive an invoice's status from its receipts: covered in full flips it to
+ * Paid, anything less rolls it back to Unpaid so a deleted or corrected receipt
+ * never leaves an invoice falsely settled. Cancelled invoices are left alone.
+ * USD is the settlement currency here — KSH tracks it at the stored rate.
+ */
+export function syncInvoicePaymentStatus(invoiceId: string): void {
+  const invoice = getInvoices().find((i) => i.id === invoiceId);
+  if (!invoice || invoice.status === "Cancelled") return;
+
+  const paid = getInvoicePaid(invoiceId);
+  const fullyPaid = invoice.amountUsd > 0 && paid.usd >= invoice.amountUsd;
+  const nextStatus: InvoiceStatus = fullyPaid ? "Paid" : "Unpaid";
+
+  if (invoice.status !== nextStatus) updateInvoice(invoiceId, { status: nextStatus });
 }
 
 // ─── Expenses ─────────────────────────────────────────────────────────────────

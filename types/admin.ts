@@ -159,6 +159,45 @@ export interface Invoice {
   updatedAt: string;
 }
 
+// ─── Receipts ─────────────────────────────────────────────────────────────────
+
+export type PaymentMethod =
+  | "M-Pesa"
+  | "Bank Transfer"
+  | "Cash"
+  | "Card"
+  | "PayPal"
+  | "Cheque"
+  | "Other";
+
+export type PaymentPurpose =
+  | "Deposit"
+  | "Balance Payment"
+  | "Full Payment"
+  | "Extra Services"
+  | "Other";
+
+export interface Receipt {
+  id: string;
+  receiptNumber: string;
+  /** Set when the payment settles an invoice — drives that invoice's paid status. */
+  invoiceId?: string;
+  /** Optional booking this money relates to, for standalone (non-invoiced) payments. */
+  saleId?: string;
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  amountKsh: number;
+  amountUsd: number;
+  method: PaymentMethod;
+  purpose: PaymentPurpose;
+  reference: string;
+  paymentDate: string;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ─── Expenses ─────────────────────────────────────────────────────────────────
 
 export type ExpenseCategory =

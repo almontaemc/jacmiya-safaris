@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getSales, getExpenses, getLeads, getTours } from "@/lib/adminStore";
-import type { Sale, Expense, Lead, AdminTour } from "@/types/admin";
-import { TrendingUp, TrendingDown, DollarSign, Target, BarChart2, FileBarChart2, Receipt, Users, ArrowRight } from "lucide-react";
+import { getSales, getExpenses, getLeads, getTours, getReceipts } from "@/lib/adminStore";
+import type { Sale, Expense, Lead, AdminTour, Receipt as ReceiptRecord } from "@/types/admin";
+import { TrendingUp, TrendingDown, DollarSign, Target, BarChart2, FileBarChart2, Receipt, Users, ArrowRight, BadgeCheck } from "lucide-react";
 
 function fmtK(n: number) {
   if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
@@ -47,6 +47,7 @@ export default function ReportsPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [tours, setTours] = useState<AdminTour[]>([]);
+  const [receipts, setReceipts] = useState<ReceiptRecord[]>([]);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -55,6 +56,7 @@ export default function ReportsPage() {
     setExpenses(getExpenses());
     setLeads(getLeads());
     setTours(getTours());
+    setReceipts(getReceipts());
   }, []);
 
   if (!mounted) return <div className="p-6 text-gray-400">Loading…</div>;
@@ -102,6 +104,8 @@ export default function ReportsPage() {
   const totalRevKsh = sales.reduce((a, s) => a + s.amountKsh, 0);
   const totalExpKshAll = expenses.reduce((a, e) => a + e.amountKsh, 0);
   const netProfit = totalRevKsh - totalExpKshAll;
+  // Booking value is what was sold; receipts are what actually landed in the bank.
+  const collectedKsh = receipts.reduce((a, r) => a + r.amountKsh, 0);
   const wonLeads = leads.filter((l) => l.status === "Won").length;
   const closedLeads = leads.filter((l) => ["Won", "Lost"].includes(l.status)).length;
   const convRate = closedLeads > 0 ? Math.round((wonLeads / closedLeads) * 100) : 0;
@@ -139,9 +143,10 @@ export default function ReportsPage() {
       </div>
 
       {/* KPI row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {[
           { label: "Total Revenue", value: `KSH ${fmtK(totalRevKsh)}`, sub: `${sales.length} bookings`, icon: TrendingUp, color: "bg-emerald-50 text-emerald-600" },
+          { label: "Cash Collected", value: `KSH ${fmtK(collectedKsh)}`, sub: `${receipts.length} receipt${receipts.length !== 1 ? "s" : ""}`, icon: BadgeCheck, color: "bg-green-50 text-green-600" },
           { label: "Total Expenses", value: `KSH ${fmtK(totalExpKshAll)}`, sub: `${expenses.length} entries`, icon: TrendingDown, color: "bg-red-50 text-red-500" },
           { label: "Net Profit", value: `KSH ${fmtK(netProfit)}`, sub: netProfit >= 0 ? "In profit" : "Net loss", icon: DollarSign, color: netProfit >= 0 ? "bg-blue-50 text-blue-600" : "bg-red-50 text-red-600" },
           { label: "Conversion Rate", value: `${convRate}%`, sub: `${wonLeads} of ${closedLeads} closed`, icon: Target, color: "bg-purple-50 text-purple-600" },

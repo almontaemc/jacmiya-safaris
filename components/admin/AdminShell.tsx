@@ -7,7 +7,7 @@ import { isAuthenticated, logout, getCurrentUser } from "@/lib/adminStore";
 import {
   LayoutDashboard, Map, Users, CalendarDays, LogOut,
   Menu, ChevronDown, ChevronRight, Target, DollarSign, Receipt,
-  BarChart2, Star, Settings, Search, X, FileText, UserCog,
+  BarChart2, Star, Settings, Search, X, FileText, UserCog, BadgeCheck,
 } from "lucide-react";
 
 const NAV = [
@@ -38,6 +38,13 @@ const NAV = [
     children: [
       { label: "All Invoices", href: "/admin/invoices" },
       { label: "New Invoice", href: "/admin/invoices/new" },
+    ],
+  },
+  {
+    label: "Receipts", icon: BadgeCheck,
+    children: [
+      { label: "All Receipts", href: "/admin/receipts" },
+      { label: "Record Payment", href: "/admin/receipts/new" },
     ],
   },
   {
@@ -89,7 +96,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [expanded, setExpanded] = useState<string[]>(["Tours", "Leads", "Sales", "Invoices", "Expenses", "Reports", "Reviews", "Human Resources", "Users"]);
+  const [expanded, setExpanded] = useState<string[]>(["Tours", "Leads", "Sales", "Invoices", "Receipts", "Expenses", "Reports", "Reviews", "Human Resources", "Users"]);
   const [searchQuery, setSearchQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
   const currentUser = getCurrentUser();

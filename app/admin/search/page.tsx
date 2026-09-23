@@ -3,9 +3,9 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { getLeads, getSales, getStaff, getExpenses, getTours, getInvoices } from "@/lib/adminStore";
-import type { Lead, Sale, StaffMember, Expense, AdminTour, Invoice } from "@/types/admin";
-import { Target, DollarSign, Users, Receipt, Map, Search, FileText } from "lucide-react";
+import { getLeads, getSales, getStaff, getExpenses, getTours, getInvoices, getReceipts } from "@/lib/adminStore";
+import type { Lead, Sale, StaffMember, Expense, AdminTour, Invoice, Receipt as ReceiptRecord } from "@/types/admin";
+import { Target, DollarSign, Users, Receipt, Map, Search, FileText, BadgeCheck } from "lucide-react";
 
 function highlight(text: string, query: string) {
   if (!query) return text;
@@ -24,6 +24,7 @@ interface SearchResults {
   leads: Lead[];
   sales: Sale[];
   invoices: Invoice[];
+  receipts: ReceiptRecord[];
   staff: StaffMember[];
   expenses: Expense[];
   tours: AdminTour[];
@@ -32,7 +33,7 @@ interface SearchResults {
 function SearchInner() {
   const searchParams = useSearchParams();
   const q = searchParams.get("q") ?? "";
-  const [results, setResults] = useState<SearchResults>({ leads: [], sales: [], invoices: [], staff: [], expenses: [], tours: [] });
+  const [results, setResults] = useState<SearchResults>({ leads: [], sales: [], invoices: [], receipts: [], staff: [], expenses: [], tours: [] });
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -52,6 +53,9 @@ function SearchInner() {
       invoices: getInvoices().filter((i) =>
         [i.clientName, i.clientEmail, i.clientPhone, i.invoiceNumber, i.notes].some((v) => v?.toLowerCase().includes(ql))
       ),
+      receipts: getReceipts().filter((r) =>
+        [r.clientName, r.clientEmail, r.clientPhone, r.receiptNumber, r.reference, r.notes].some((v) => v?.toLowerCase().includes(ql))
+      ),
       staff: getStaff().filter((s) =>
         [s.name, s.email, s.role, s.department].some((v) => v?.toLowerCase().includes(ql))
       ),
@@ -64,13 +68,13 @@ function SearchInner() {
     });
   }, [q, mounted]);
 
-  const total = results.leads.length + results.sales.length + results.invoices.length + results.staff.length + results.expenses.length + results.tours.length;
+  const total = results.leads.length + results.sales.length + results.invoices.length + results.receipts.length + results.staff.length + results.expenses.length + results.tours.length;
 
   if (!q) {
     return (
       <div className="text-center py-20">
         <Search className="w-10 h-10 text-gray-200 mx-auto mb-4" />
-        <p className="text-gray-400 text-sm">Use the search bar at the top to find leads, bookings, staff, expenses, and tours.</p>
+        <p className="text-gray-400 text-sm">Use the search bar at the top to find leads, bookings, invoices, receipts, staff, expenses, and tours.</p>
       </div>
     );
   }
@@ -141,6 +145,24 @@ function SearchInner() {
                 <div className="text-xs text-gray-400">{highlight(i.invoiceNumber, q)} · {highlight(i.clientEmail, q)}</div>
               </div>
               <span className="text-xs text-gray-400 flex-shrink-0">{i.status}</span>
+            </Link>
+          ))}
+        </Section>
+      )}
+
+      {/* Receipts */}
+      {results.receipts.length > 0 && (
+        <Section title="Receipts" icon={BadgeCheck} count={results.receipts.length} iconColor="text-green-600 bg-green-50">
+          {results.receipts.map((r) => (
+            <Link key={r.id} href={`/admin/receipts/${r.id}`} className="flex items-center gap-3 px-5 py-3.5 hover:bg-gray-50 transition-colors">
+              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                <span className="text-green-700 font-bold text-xs">{r.clientName.charAt(0)}</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium text-gray-800">{highlight(r.clientName, q)}</div>
+                <div className="text-xs text-gray-400">{highlight(r.receiptNumber, q)} · {r.method} · {r.paymentDate}</div>
+              </div>
+              <span className="text-xs font-semibold text-green-700 flex-shrink-0">USD {r.amountUsd.toLocaleString()}</span>
             </Link>
           ))}
         </Section>

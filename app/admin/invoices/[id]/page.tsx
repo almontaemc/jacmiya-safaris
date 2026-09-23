@@ -2,9 +2,12 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
-import { getInvoices, updateInvoice, getSettings, getInvoiceDisplayStatus } from "@/lib/adminStore";
-import type { Invoice, InvoiceStatus, AppSettings } from "@/types/admin";
-import { ArrowLeft, Printer, CheckCircle, Clock, AlertTriangle, XCircle } from "lucide-react";
+import {
+  getInvoices, updateInvoice, getSettings, getInvoiceDisplayStatus,
+  getReceiptsForInvoice, getInvoicePaid, getInvoiceBalance,
+} from "@/lib/adminStore";
+import type { Invoice, InvoiceStatus, AppSettings, Receipt } from "@/types/admin";
+import { ArrowLeft, Printer, CheckCircle, Clock, AlertTriangle, XCircle, Plus, BadgeCheck } from "lucide-react";
 
 const STATUSES: InvoiceStatus[] = ["Unpaid", "Paid", "Cancelled"];
 const STATUS_COLOR: Record<InvoiceStatus | "Overdue", string> = {
@@ -28,6 +31,7 @@ function formatDate(iso: string) {
 export default function InvoiceDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [invoice, setInvoice] = useState<Invoice | null>(null);
+  const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [status, setStatus] = useState<InvoiceStatus>("Unpaid");
   const [notes, setNotes] = useState("");
@@ -40,6 +44,7 @@ export default function InvoiceDetail({ params }: { params: Promise<{ id: string
       setInvoice(found);
       setStatus(found.status);
       setNotes(found.notes);
+      setReceipts(getReceiptsForInvoice(found.id));
     }
   }
 
@@ -84,6 +89,9 @@ export default function InvoiceDetail({ params }: { params: Promise<{ id: string
 
   const displayStatus = getInvoiceDisplayStatus(invoice);
   const StatusIcon = STATUS_ICON[displayStatus];
+  const paid = getInvoicePaid(invoice.id);
+  const balance = getInvoiceBalance(invoice);
+  const hasPayments = receipts.length > 0;
 
   function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -106,6 +114,11 @@ export default function InvoiceDetail({ params }: { params: Promise<{ id: string
           <h1 className="text-2xl font-bold text-gray-900">{invoice.invoiceNumber}</h1>
           <p className="text-gray-500 text-sm">{invoice.clientName} · {invoice.clientEmail}</p>
         </div>
+        {balance.usd > 0 && invoice.status !== "Cancelled" && invoice.status !== "Paid" && (
+          <Link href={`/admin/receipts/new?invoiceId=${invoice.id}`} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
+            <Plus className="w-4 h-4" /> Record Payment
+          </Link>
+        )}
         <button onClick={() => window.print()} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
           <Printer className="w-4 h-4" /> Print / PDF
         </button>
@@ -180,10 +193,26 @@ export default function InvoiceDetail({ params }: { params: Promise<{ id: string
               </tbody>
               <tfoot>
                 <tr className="border-t-2 border-gray-200 bg-[#3d5a3e]/5 font-bold">
-                  <td colSpan={3} className="px-5 py-4 text-gray-800">Total Due</td>
+                  <td colSpan={3} className="px-5 py-4 text-gray-800">{hasPayments ? "Invoice Total" : "Total Due"}</td>
                   <td className="px-5 py-4 text-right text-base text-[#3d5a3e]">USD {invoice.amountUsd.toLocaleString()}</td>
                   <td className="px-5 py-4 text-right text-gray-600">KSH {invoice.amountKsh.toLocaleString()}</td>
                 </tr>
+                {hasPayments && (
+                  <>
+                    <tr className="border-t border-gray-100">
+                      <td colSpan={3} className="px-5 py-3 text-gray-600">Paid to date ({receipts.length} receipt{receipts.length !== 1 ? "s" : ""})</td>
+                      <td className="px-5 py-3 text-right font-semibold text-green-700">− USD {paid.usd.toLocaleString()}</td>
+                      <td className="px-5 py-3 text-right text-gray-500">− KSH {paid.ksh.toLocaleString()}</td>
+                    </tr>
+                    <tr className="border-t-2 border-gray-200 font-bold">
+                      <td colSpan={3} className="px-5 py-4 text-gray-800">Balance Due</td>
+                      <td className={`px-5 py-4 text-right text-base ${balance.usd > 0 ? "text-red-600" : "text-green-700"}`}>
+                        USD {Math.max(balance.usd, 0).toLocaleString()}
+                      </td>
+                      <td className="px-5 py-4 text-right text-gray-600">KSH {Math.max(balance.ksh, 0).toLocaleString()}</td>
+                    </tr>
+                  </>
+                )}
               </tfoot>
             </table>
           </div>
@@ -209,6 +238,44 @@ export default function InvoiceDetail({ params }: { params: Promise<{ id: string
         </div>
       </div>
 
+      {/* Payments received — hidden on print, the receipts carry their own paperwork */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-3 print:hidden">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <h2 className="font-semibold text-gray-800">Payments Received</h2>
+          {balance.usd > 0 && invoice.status !== "Cancelled" && invoice.status !== "Paid" && (
+            <Link href={`/admin/receipts/new?invoiceId=${invoice.id}`} className="flex items-center gap-1.5 text-sm font-semibold text-green-700 hover:text-green-800">
+              <Plus className="w-4 h-4" /> Record a payment
+            </Link>
+          )}
+        </div>
+
+        {!hasPayments && (
+          <p className="text-sm text-gray-400">
+            Nothing received yet. Recording a payment issues a numbered receipt and marks this invoice Paid once it's covered in full.
+          </p>
+        )}
+
+        {hasPayments && (
+          <div className="divide-y divide-gray-50 border border-gray-100 rounded-xl overflow-hidden">
+            {receipts.map((r) => (
+              <div key={r.id} className="px-4 py-3 flex items-center gap-3">
+                <BadgeCheck className="w-4 h-4 text-green-600 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <Link href={`/admin/receipts/${r.id}`} className="text-sm font-semibold text-gray-800 hover:text-blue-600">{r.receiptNumber}</Link>
+                  <p className="text-xs text-gray-500">
+                    {r.purpose} · {r.method}{r.reference && ` · Ref ${r.reference}`} · {r.paymentDate}
+                  </p>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <div className="text-sm font-bold text-green-700">USD {r.amountUsd.toLocaleString()}</div>
+                  <div className="text-xs text-gray-500">KSH {r.amountKsh.toLocaleString()}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Update form — hidden on print */}
       <form onSubmit={handleSave} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4 print:hidden">
         <h2 className="font-semibold text-gray-800">Update Invoice</h2>
@@ -226,6 +293,7 @@ export default function InvoiceDetail({ params }: { params: Promise<{ id: string
             })}
           </div>
           {status === "Unpaid" && <p className="text-xs text-gray-400 mt-1.5">Automatically shows as &ldquo;Overdue&rdquo; once past the due date.</p>}
+          {hasPayments && <p className="text-xs text-gray-400 mt-1.5">Recording or deleting a receipt re-derives this status from what&rsquo;s actually been paid.</p>}
         </div>
         <div>
           <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">Notes</label>
