@@ -287,6 +287,9 @@ export default function SaleDetail({ params }: { params: Promise<{ id: string }>
         <Link href="/admin/sales" className="border border-gray-200 text-gray-600 hover:bg-gray-50 font-semibold px-6 py-3 rounded-xl text-sm transition-colors">
           ← Back to Bookings
         </Link>
+        <Link href={`/admin/vouchers/new?saleId=${sale.id}`} className="ml-3 border border-gray-200 text-gray-600 hover:bg-gray-50 font-semibold px-6 py-3 rounded-xl text-sm transition-colors">
+          Create lodge voucher
+        </Link>
       </div>
     </div>
   );

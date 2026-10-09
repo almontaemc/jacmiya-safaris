@@ -198,6 +198,44 @@ export interface Receipt {
   updatedAt: string;
 }
 
+// ─── Booking Vouchers ─────────────────────────────────────────────────────────
+
+export type VoucherStatus = "Confirm" | "Amend" | "Request";
+
+export type VoucherRoomType =
+  | "twinRooms"
+  | "singleRooms"
+  | "tripleRooms"
+  | "suitesCottages"
+  | "doubleTents"
+  | "singleTents";
+
+export interface Voucher {
+  id: string;
+  /** Plain running number, continuing the paper voucher book. */
+  voucherNumber: number;
+  /** Optional booking this voucher was raised for. */
+  saleId?: string;
+  status: VoucherStatus;
+  issueDate: string;
+  /** Lodge / hotel / other supplier the voucher is addressed to. */
+  supplierName: string;
+  clientNames: string;
+  adults: number;
+  children: number;
+  arrivalDate: string;
+  arrivalTime: string;
+  arrivalMethod: string;
+  departureDate: string;
+  departureTime: string;
+  departureMethod: string;
+  nights: number;
+  rooms: Record<VoucherRoomType, number>;
+  specialNotes: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ─── Expenses ─────────────────────────────────────────────────────────────────
 
 export type ExpenseCategory =

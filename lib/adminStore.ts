@@ -4,7 +4,7 @@ import type {
   Lead, FollowUp, Sale, Expense,
   PayrollRun, PayrollEntry,
   Review, AppSettings, Invoice, InvoiceStatus,
-  Receipt, AdminUser,
+  Receipt, AdminUser, Voucher,
 } from "@/types/admin";
 
 const ADMIN_PASSWORD_KEY = "jm_admin_pwd";
@@ -24,6 +24,8 @@ const INVOICES_KEY = "jm_invoices";
 const INVOICE_SEQ_KEY = "jm_invoice_seq";
 const RECEIPTS_KEY = "jm_receipts";
 const RECEIPT_SEQ_KEY = "jm_receipt_seq";
+const VOUCHERS_KEY = "jm_vouchers";
+const VOUCHER_SEQ_KEY = "jm_voucher_seq";
 const USERS_KEY = "jm_users";
 const CURRENT_USER_KEY = "jm_admin_user";
 const DEFAULT_RATE = 129;
@@ -260,7 +262,7 @@ export function generateBookingRef(): string {
 
 // ─── Backup & Restore ─────────────────────────────────────────────────────────
 
-const ALL_KEYS = [TOURS_KEY, STAFF_KEY, LEAVE_KEY, RATE_KEY, LEADS_KEY, SALES_KEY, EXPENSES_KEY, PAYROLL_KEY, REVIEWS_KEY, SETTINGS_KEY, BOOKING_SEQ_KEY, ADMIN_PASSWORD_KEY, INVOICES_KEY, INVOICE_SEQ_KEY, RECEIPTS_KEY, RECEIPT_SEQ_KEY, USERS_KEY];
+const ALL_KEYS = [TOURS_KEY, STAFF_KEY, LEAVE_KEY, RATE_KEY, LEADS_KEY, SALES_KEY, EXPENSES_KEY, PAYROLL_KEY, REVIEWS_KEY, SETTINGS_KEY, BOOKING_SEQ_KEY, ADMIN_PASSWORD_KEY, INVOICES_KEY, INVOICE_SEQ_KEY, RECEIPTS_KEY, RECEIPT_SEQ_KEY, VOUCHERS_KEY, VOUCHER_SEQ_KEY, USERS_KEY];
 
 export function exportAllData(): string {
   const data: Record<string, unknown> = { _exportedAt: new Date().toISOString(), _version: "1" };
@@ -516,6 +518,51 @@ export function getInvoiceDisplayStatus(invoice: Invoice): InvoiceStatus | "Over
   }
   return invoice.status;
 }
+
+// ─── Booking Vouchers ─────────────────────────────────────────────────────────
+
+/** The number the next voucher will get, without consuming it. */
+export function peekNextVoucherNumber(): number {
+  if (typeof window === "undefined") return 1;
+  return Number(localStorage.getItem(VOUCHER_SEQ_KEY) ?? "0") + 1;
+}
+
+export function getVouchers(): Voucher[] {
+  if (typeof window === "undefined") return [];
+  const raw = localStorage.getItem(VOUCHERS_KEY);
+  if (raw) return JSON.parse(raw) as Voucher[];
+  localStorage.setItem(VOUCHERS_KEY, JSON.stringify([]));
+  return [];
+}
+
+export function saveVouchers(vouchers: Voucher[]): void { localStorage.setItem(VOUCHERS_KEY, JSON.stringify(vouchers)); }
+
+/**
+ * The number is passed in rather than generated so staff can carry on from the
+ * paper voucher book — typing 108 on the first one moves the sequence up to it.
+ */
+export function addVoucher(voucher: Omit<Voucher, "id" | "createdAt" | "updatedAt">): Voucher {
+  const newVoucher: Voucher = {
+    ...voucher,
+    id: `vch_${Date.now()}`,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  saveVouchers([...getVouchers(), newVoucher]);
+  const seq = Number(localStorage.getItem(VOUCHER_SEQ_KEY) ?? "0");
+  localStorage.setItem(VOUCHER_SEQ_KEY, String(Math.max(seq, newVoucher.voucherNumber)));
+  return newVoucher;
+}
+
+export function updateVoucher(id: string, updates: Partial<Voucher>): void {
+  const vouchers = getVouchers();
+  const idx = vouchers.findIndex((v) => v.id === id);
+  if (idx === -1) return;
+  vouchers[idx] = { ...vouchers[idx], ...updates, updatedAt: new Date().toISOString() };
+  saveVouchers(vouchers);
+}
+
+export function deleteVoucher(id: string): void { saveVouchers(getVouchers().filter((v) => v.id !== id)); }
 
 // ─── Receipts ─────────────────────────────────────────────────────────────────
 
