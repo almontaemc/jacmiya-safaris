@@ -3,66 +3,69 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { isAuthenticated, logout, getCurrentUser } from "@/lib/adminStore";
+import { api } from "@/lib/api";
+import { AdminSessionProvider, type SessionUser } from "@/components/admin/AdminSession";
+import { canAccessPath, canAccessSection, hasFullAccess, homePathFor } from "@/lib/adminAccess";
+import type { AdminSection } from "@/types/admin";
 import {
   LayoutDashboard, Map, Users, CalendarDays, LogOut,
   Menu, ChevronDown, ChevronRight, Target, DollarSign, Receipt,
-  BarChart2, Star, Settings, Search, X, FileText, UserCog, BadgeCheck, Ticket,
+  BarChart2, Star, Settings, Search, X, FileText, UserCog, BadgeCheck, Ticket, KeyRound,
 } from "lucide-react";
 
 const NAV = [
-  { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { label: "Dashboard", href: "/admin", section: "dashboard" as AdminSection, icon: LayoutDashboard },
   {
-    label: "Tours", icon: Map,
+    label: "Tours", section: "tours" as AdminSection, icon: Map,
     children: [
       { label: "All Tours", href: "/admin/tours" },
       { label: "Add Tour", href: "/admin/tours/new" },
     ],
   },
   {
-    label: "Leads", icon: Target,
+    label: "Leads", section: "leads" as AdminSection, icon: Target,
     children: [
       { label: "All Leads", href: "/admin/leads" },
       { label: "Add Lead", href: "/admin/leads/new" },
     ],
   },
   {
-    label: "Sales", icon: DollarSign,
+    label: "Sales", section: "sales" as AdminSection, icon: DollarSign,
     children: [
       { label: "All Bookings", href: "/admin/sales" },
       { label: "Add Booking", href: "/admin/sales/new" },
     ],
   },
   {
-    label: "Invoices", icon: FileText,
+    label: "Invoices", section: "invoices" as AdminSection, icon: FileText,
     children: [
       { label: "All Invoices", href: "/admin/invoices" },
       { label: "New Invoice", href: "/admin/invoices/new" },
     ],
   },
   {
-    label: "Receipts", icon: BadgeCheck,
+    label: "Receipts", section: "receipts" as AdminSection, icon: BadgeCheck,
     children: [
       { label: "All Receipts", href: "/admin/receipts" },
       { label: "Record Payment", href: "/admin/receipts/new" },
     ],
   },
   {
-    label: "Vouchers", icon: Ticket,
+    label: "Vouchers", section: "vouchers" as AdminSection, icon: Ticket,
     children: [
       { label: "All Vouchers", href: "/admin/vouchers" },
       { label: "New Voucher", href: "/admin/vouchers/new" },
     ],
   },
   {
-    label: "Expenses", icon: Receipt,
+    label: "Expenses", section: "expenses" as AdminSection, icon: Receipt,
     children: [
       { label: "All Expenses", href: "/admin/expenses" },
       { label: "Add Expense", href: "/admin/expenses/new" },
     ],
   },
   {
-    label: "Reports", icon: BarChart2,
+    label: "Reports", section: "reports" as AdminSection, icon: BarChart2,
     children: [
       { label: "Overview", href: "/admin/reports" },
       { label: "Sales Report", href: "/admin/reports/sales" },
@@ -73,14 +76,14 @@ const NAV = [
     ],
   },
   {
-    label: "Reviews", icon: Star,
+    label: "Reviews", section: "reviews" as AdminSection, icon: Star,
     children: [
       { label: "All Reviews", href: "/admin/reviews" },
       { label: "Add Review", href: "/admin/reviews/new" },
     ],
   },
   {
-    label: "Human Resources", icon: Users,
+    label: "Human Resources", section: "hr" as AdminSection, icon: Users,
     children: [
       { label: "HR Overview", href: "/admin/hr" },
       { label: "Staff", href: "/admin/hr/staff" },
@@ -89,35 +92,48 @@ const NAV = [
     ],
   },
   {
-    label: "Users", icon: UserCog,
+    label: "Users", section: "users" as AdminSection, icon: UserCog,
     children: [
       { label: "All Users", href: "/admin/users" },
       { label: "Add User", href: "/admin/users/new" },
     ],
   },
-  { label: "Settings", href: "/admin/settings", icon: Settings },
+  { label: "Settings", href: "/admin/settings", section: "settings" as AdminSection, icon: Settings },
 ];
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [expanded, setExpanded] = useState<string[]>(["Tours", "Leads", "Sales", "Invoices", "Receipts", "Vouchers", "Expenses", "Reports", "Reviews", "Human Resources", "Users"]);
   const [searchQuery, setSearchQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
-  const currentUser = getCurrentUser();
+  const [currentUser, setCurrentUser] = useState<SessionUser | null>(null);
+  const isLogin = pathname === "/admin/login";
+
+  // Ask the server who is signed in on every navigation, so access changed on
+  // the Users page (or a deactivated account) takes effect straight away.
+  useEffect(() => {
+    if (isLogin) return;
+    let cancelled = false;
+    api<{ user: SessionUser }>("/api/auth/me")
+      .then(({ user }) => { if (!cancelled) setCurrentUser(user); })
+      .catch(() => { if (!cancelled) router.replace("/admin/login"); });
+    return () => { cancelled = true; };
+  }, [pathname, isLogin, router]);
+
+  const allowed = currentUser !== null && canAccessPath(currentUser, pathname);
+  const homePath = homePathFor(currentUser);
 
   useEffect(() => {
-    setMounted(true);
-    if (!isAuthenticated() && pathname !== "/admin/login") {
-      router.replace("/admin/login");
-    }
-  }, [pathname, router]);
+    if (currentUser && !allowed) router.replace(homePath);
+  }, [currentUser, allowed, homePath, router]);
 
-  if (!mounted) return null;
-  if (pathname === "/admin/login") return <>{children}</>;
-  if (!isAuthenticated()) return null;
+  if (isLogin) return <>{children}</>;
+  if (!currentUser || !allowed) return null;
+
+  const visibleNav = NAV.filter((item) => canAccessSection(currentUser, item.section));
+  const fullAccess = hasFullAccess(currentUser);
 
   function toggleSection(label: string) {
     setExpanded((prev) => prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]);
@@ -128,8 +144,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
     return pathname.startsWith(href);
   }
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
+    await api("/api/auth/logout", { method: "POST" }).catch(() => {});
     router.push("/admin/login");
   }
 
@@ -152,7 +168,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       </div>
 
       <nav className="flex-1 px-3 py-4 overflow-y-auto space-y-1">
-        {NAV.map((item) => {
+        {visibleNav.map((item) => {
           if (!item.children) {
             return (
               <Link key={item.href} href={item.href!} onClick={() => setSidebarOpen(false)}
@@ -193,8 +209,12 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         <div className="px-3 py-2 mb-1">
           <p className="text-white/80 text-sm font-medium">{currentUser?.name ?? "Jacmiya Admin"}</p>
           <p className="text-white/30 text-xs">{currentUser?.email ?? "jacmiya@jacmiyasafaris.com"}</p>
-          {currentUser && <p className="text-white/20 text-[10px] uppercase tracking-wider mt-0.5">{currentUser.role}</p>}
+          {currentUser && <p className="text-white/20 text-[10px] uppercase tracking-wider mt-0.5">{currentUser.jobTitle || currentUser.role}</p>}
         </div>
+        <Link href="/admin/account" onClick={() => setSidebarOpen(false)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/50 hover:text-white hover:bg-white/5 transition-colors">
+          <KeyRound className="w-4 h-4" />
+          Change Password
+        </Link>
         <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/50 hover:text-red-400 hover:bg-white/5 transition-colors">
           <LogOut className="w-4 h-4" />
           Sign Out
@@ -222,7 +242,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           <div className="flex-1">
             <Breadcrumb pathname={pathname} />
           </div>
-          {/* Global search */}
+          {/* Global search — it reaches every section, so full-access accounts only */}
+          {fullAccess && (
           <form onSubmit={handleSearch} className="hidden sm:flex items-center gap-2 bg-gray-100 rounded-xl px-3 py-1.5 w-56">
             <Search className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
             <input
@@ -238,11 +259,12 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
               </button>
             )}
           </form>
+          )}
           <span className="text-xs text-gray-400 hidden lg:block">Jacmiya Safaris Admin</span>
         </header>
 
         <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-          {children}
+          <AdminSessionProvider value={currentUser}>{children}</AdminSessionProvider>
         </main>
       </div>
     </div>

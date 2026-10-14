@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { addVoucher, updateVoucher, getSales, peekNextVoucherNumber } from "@/lib/adminStore";
+import { getSales } from "@/lib/adminStore";
+import { api, ApiError } from "@/lib/api";
 import type { Sale, Voucher, VoucherStatus, VoucherRoomType } from "@/types/admin";
 
 export const VOUCHER_STATUSES: VoucherStatus[] = ["Confirm", "Amend", "Request"];
@@ -43,6 +44,7 @@ export default function VoucherForm({ mode, initial, presetSaleId }: {
 }) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
   const [sales, setSales] = useState<Sale[]>([]);
 
   const [voucherNumber, setVoucherNumber] = useState(initial && mode === "edit" ? initial.voucherNumber : 0);
@@ -67,7 +69,7 @@ export default function VoucherForm({ mode, initial, presetSaleId }: {
     const allSales = getSales();
     setSales(allSales);
     if (mode === "create") {
-      setVoucherNumber(peekNextVoucherNumber());
+      api<{ next: number }>("/api/vouchers/next-number").then(({ next }) => setVoucherNumber(next)).catch(() => {});
       if (presetSaleId && !initial) applySale(presetSaleId, allSales);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -92,10 +94,11 @@ export default function VoucherForm({ mode, initial, presetSaleId }: {
     setNights(nightsBetween(arrivalDate, v));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError("");
     if (departureDate < arrivalDate) {
-      alert("Departure date is before the arrival date.");
+      setError("Departure date is before the arrival date.");
       return;
     }
     setSaving(true);
@@ -106,11 +109,17 @@ export default function VoucherForm({ mode, initial, presetSaleId }: {
       departureDate, departureTime, departureMethod,
       nights, rooms, specialNotes,
     };
-    if (mode === "edit" && initial) {
-      updateVoucher(initial.id, data);
-      router.push(`/admin/vouchers/${initial.id}`);
-    } else {
-      router.push(`/admin/vouchers/${addVoucher(data).id}`);
+    try {
+      if (mode === "edit" && initial) {
+        await api(`/api/vouchers/${initial.id}`, { method: "PATCH", body: data });
+        router.push(`/admin/vouchers/${initial.id}`);
+      } else {
+        const { id } = await api<{ id: string }>("/api/vouchers", { method: "POST", body: data });
+        router.push(`/admin/vouchers/${id}`);
+      }
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Could not reach the server. Your details are still here — try again.");
+      setSaving(false);
     }
   }
 
@@ -241,6 +250,8 @@ export default function VoucherForm({ mode, initial, presetSaleId }: {
       <Card title="Special Notes">
         <textarea rows={3} className={`${inputCls} resize-none`} value={specialNotes} onChange={(e) => setSpecialNotes(e.target.value)} placeholder="Room allocation, dietary needs, celebrations — shown on the voucher." />
       </Card>
+
+      {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">{error}</div>}
 
       <div className="flex gap-3 pt-2 pb-8">
         <button type="submit" disabled={saving} className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-colors disabled:opacity-60">

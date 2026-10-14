@@ -2,7 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
-import { getVouchers } from "@/lib/adminStore";
+import { api } from "@/lib/api";
 import type { Voucher } from "@/types/admin";
 import VoucherForm from "@/components/admin/VoucherForm";
 import { ArrowLeft } from "lucide-react";
@@ -13,8 +13,10 @@ export default function EditVoucherPage({ params }: { params: Promise<{ id: stri
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setVoucher(getVouchers().find((v) => v.id === id) ?? null);
-    setReady(true);
+    api<{ voucher: Voucher }>(`/api/vouchers/${id}`)
+      .then(({ voucher: found }) => setVoucher(found))
+      .catch(() => setVoucher(null))
+      .finally(() => setReady(true));
   }, [id]);
 
   if (!ready) return null;

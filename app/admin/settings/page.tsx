@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import {
   getSettings, saveSettings, getExchangeRate, setExchangeRate,
-  verifyCurrentPassword, changeMyPassword, exportAllData, importAllData,
+  exportAllData, importAllData,
 } from "@/lib/adminStore";
+import { api, ApiError } from "@/lib/api";
 import type { AppSettings } from "@/types/admin";
 import { Building2, Lock, RefreshCw, Database, CheckCircle, AlertCircle, Download, Upload } from "lucide-react";
 
@@ -53,13 +54,17 @@ export default function SettingsPage() {
     setTimeout(() => setSaved(false), 3000);
   }
 
-  function handleChangePassword(e: React.FormEvent) {
+  async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault();
     setPwdError("");
-    if (!verifyCurrentPassword(currentPwd)) { setPwdError("Current password is incorrect."); return; }
     if (newPwd.length < 8) { setPwdError("New password must be at least 8 characters."); return; }
     if (newPwd !== confirmPwd) { setPwdError("Passwords do not match."); return; }
-    changeMyPassword(newPwd);
+    try {
+      await api("/api/auth/password", { method: "POST", body: { currentPassword: currentPwd, newPassword: newPwd } });
+    } catch (err) {
+      setPwdError(err instanceof ApiError ? err.message : "Could not reach the server.");
+      return;
+    }
     setCurrentPwd(""); setNewPwd(""); setConfirmPwd("");
     setPwdSuccess(true);
     setTimeout(() => setPwdSuccess(false), 3000);
@@ -181,7 +186,7 @@ export default function SettingsPage() {
             <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
               <Lock className="w-4 h-4 text-blue-600" />
             </div>
-            <h2 className="font-semibold text-gray-800">Change Admin Password</h2>
+            <h2 className="font-semibold text-gray-800">Change Your Password</h2>
           </div>
           <div className="space-y-4 max-w-sm">
             <div>

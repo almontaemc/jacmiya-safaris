@@ -20,6 +20,25 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Admin database
+
+Admin accounts, sign-in sessions and booking vouchers are stored in a Neon Postgres
+database (Vercel → Storage → `jacmiya-db`). Everything else in the admin (tours,
+leads, sales, invoices, receipts, expenses, HR, reviews, settings) is still kept in
+each browser's local storage.
+
+- `vercel env pull .env.local` — fetch the database connection settings.
+- `npm run db:migrate` — create or update the tables from `db/schema.sql` (safe to re-run).
+
+**First-time setup:** while the database has no accounts, `/admin/login` shows a
+"create the owner account" form. Do this straight after the first deploy — once one
+account exists the form is gone for good. The owner then adds staff under
+Admin → Users, choosing full access or specific sections per person.
+
+**Moving old data in:** accounts and vouchers created before the database existed
+live in the browser they were made in. Export a backup there (Settings → Backup &
+Restore) and upload it on the Users page; existing emails and voucher numbers are skipped.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

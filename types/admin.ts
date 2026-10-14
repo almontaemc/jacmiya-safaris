@@ -310,12 +310,21 @@ export interface Review {
 
 export type UserRole = "Owner" | "Admin" | "Manager" | "Staff";
 
+/** Admin areas an account can be limited to — see lib/adminAccess.ts. */
+export type AdminSection =
+  | "dashboard" | "tours" | "leads" | "sales" | "invoices" | "receipts" | "vouchers"
+  | "expenses" | "reports" | "reviews" | "hr" | "users" | "settings";
+
 export interface AdminUser {
   id: string;
   name: string;
   email: string;
   password: string;
   role: UserRole;
+  /** Job title shown alongside the name, e.g. "Reservations Manager". */
+  jobTitle?: string;
+  /** Sections this account may open. Missing means full access. */
+  access?: AdminSection[];
   active: boolean;
   createdAt: string;
   lastLogin?: string;

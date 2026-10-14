@@ -4,11 +4,10 @@ import type {
   Lead, FollowUp, Sale, Expense,
   PayrollRun, PayrollEntry,
   Review, AppSettings, Invoice, InvoiceStatus,
-  Receipt, AdminUser, Voucher,
+  Receipt,
 } from "@/types/admin";
 
 const ADMIN_PASSWORD_KEY = "jm_admin_pwd";
-const DEFAULT_PASSWORD = "Jacmiya@2026";
 const TOURS_KEY = "jm_tours";
 const STAFF_KEY = "jm_staff";
 const LEAVE_KEY = "jm_leave";
@@ -27,7 +26,6 @@ const RECEIPT_SEQ_KEY = "jm_receipt_seq";
 const VOUCHERS_KEY = "jm_vouchers";
 const VOUCHER_SEQ_KEY = "jm_voucher_seq";
 const USERS_KEY = "jm_users";
-const CURRENT_USER_KEY = "jm_admin_user";
 const DEFAULT_RATE = 129;
 
 // ─── Initial data ─────────────────────────────────────────────────────────────
@@ -115,115 +113,9 @@ const INITIAL_PAYROLL: PayrollRun[] = [
   },
 ];
 
-// ─── Auth (legacy shared password) ───────────────────────────────────────────
-
-export function getAdminPassword(): string {
-  if (typeof window === "undefined") return DEFAULT_PASSWORD;
-  return localStorage.getItem(ADMIN_PASSWORD_KEY) ?? DEFAULT_PASSWORD;
-}
-
-export function changeAdminPassword(newPwd: string): void {
-  localStorage.setItem(ADMIN_PASSWORD_KEY, newPwd);
-}
-
-// True if `pwd` matches the shared fallback password or the optional
-// NEXT_PUBLIC_ADMIN_PASSWORD_2 env var — used for logins/passwords that
-// predate (or fall outside) the named Users list below.
-export function checkPassword(pwd: string): boolean {
-  const secondary = process.env.NEXT_PUBLIC_ADMIN_PASSWORD_2;
-  if (secondary && pwd === secondary) return true;
-  return pwd === getAdminPassword();
-}
-
-// ─── Users & Roles ────────────────────────────────────────────────────────────
-
-export function getUsers(): AdminUser[] {
-  if (typeof window === "undefined") return [];
-  const raw = localStorage.getItem(USERS_KEY);
-  if (raw) return JSON.parse(raw) as AdminUser[];
-  // First run: seed the Owner account. If this browser previously changed the
-  // shared password via Settings > Security, carry that over so nobody is
-  // locked out by the migration to named accounts.
-  const initial: AdminUser[] = [{
-    id: "u1",
-    name: "Jacmiya Admin",
-    email: "jacmiya@jacmiyasafaris.com",
-    password: getAdminPassword(),
-    role: "Owner",
-    active: true,
-    createdAt: "2026-01-01T00:00:00.000Z",
-  }];
-  localStorage.setItem(USERS_KEY, JSON.stringify(initial));
-  return initial;
-}
-
-export function saveUsers(users: AdminUser[]): void { localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
-
-export function addUser(user: Omit<AdminUser, "id" | "createdAt">): AdminUser {
-  const newUser: AdminUser = { ...user, id: `u_${Date.now()}`, createdAt: new Date().toISOString() };
-  saveUsers([...getUsers(), newUser]);
-  return newUser;
-}
-
-export function updateUser(id: string, updates: Partial<AdminUser>): void {
-  const users = getUsers();
-  const idx = users.findIndex((u) => u.id === id);
-  if (idx !== -1) { users[idx] = { ...users[idx], ...updates }; saveUsers(users); }
-}
-
-export function deleteUser(id: string): void { saveUsers(getUsers().filter((u) => u.id !== id)); }
-
-// ─── Session ──────────────────────────────────────────────────────────────────
-
-export interface CurrentUser { id: string; name: string; email: string; role: AdminUser["role"] }
-
-export function getCurrentUser(): CurrentUser | null {
-  if (typeof window === "undefined") return null;
-  const raw = sessionStorage.getItem(CURRENT_USER_KEY);
-  return raw ? (JSON.parse(raw) as CurrentUser) : null;
-}
-
-export function isAuthenticated(): boolean {
-  if (typeof window === "undefined") return false;
-  return sessionStorage.getItem("jm_admin") === "yes";
-}
-
-// Tries the named Users list first (so the sidebar/footer can show who's
-// actually logged in), then falls back to the shared password / env var.
-export function loginWithPassword(pwd: string): boolean {
-  const user = getUsers().find((u) => u.active && u.password === pwd);
-  if (user) {
-    sessionStorage.setItem("jm_admin", "yes");
-    sessionStorage.setItem(CURRENT_USER_KEY, JSON.stringify({ id: user.id, name: user.name, email: user.email, role: user.role }));
-    updateUser(user.id, { lastLogin: new Date().toISOString() });
-    return true;
-  }
-  if (checkPassword(pwd)) {
-    sessionStorage.setItem("jm_admin", "yes");
-    sessionStorage.removeItem(CURRENT_USER_KEY);
-    return true;
-  }
-  return false;
-}
-
-export function logout(): void {
-  sessionStorage.removeItem("jm_admin");
-  sessionStorage.removeItem(CURRENT_USER_KEY);
-}
-
-// For Settings > Security: verifies against whichever account is actually
-// signed in, falling back to the shared password for anonymous/legacy logins.
-export function verifyCurrentPassword(pwd: string): boolean {
-  const current = getCurrentUser();
-  if (current) return getUsers().find((u) => u.id === current.id)?.password === pwd;
-  return checkPassword(pwd);
-}
-
-export function changeMyPassword(newPwd: string): void {
-  const current = getCurrentUser();
-  if (current) updateUser(current.id, { password: newPwd });
-  else changeAdminPassword(newPwd);
-}
+// Accounts, sign-in and vouchers live in the shared database now — see
+// lib/server and app/api. Their old storage keys stay in ALL_KEYS below so a
+// browser that still holds them can export a backup for the one-time import.
 
 // ─── Settings ─────────────────────────────────────────────────────────────────
 
@@ -518,51 +410,6 @@ export function getInvoiceDisplayStatus(invoice: Invoice): InvoiceStatus | "Over
   }
   return invoice.status;
 }
-
-// ─── Booking Vouchers ─────────────────────────────────────────────────────────
-
-/** The number the next voucher will get, without consuming it. */
-export function peekNextVoucherNumber(): number {
-  if (typeof window === "undefined") return 1;
-  return Number(localStorage.getItem(VOUCHER_SEQ_KEY) ?? "0") + 1;
-}
-
-export function getVouchers(): Voucher[] {
-  if (typeof window === "undefined") return [];
-  const raw = localStorage.getItem(VOUCHERS_KEY);
-  if (raw) return JSON.parse(raw) as Voucher[];
-  localStorage.setItem(VOUCHERS_KEY, JSON.stringify([]));
-  return [];
-}
-
-export function saveVouchers(vouchers: Voucher[]): void { localStorage.setItem(VOUCHERS_KEY, JSON.stringify(vouchers)); }
-
-/**
- * The number is passed in rather than generated so staff can carry on from the
- * paper voucher book — typing 108 on the first one moves the sequence up to it.
- */
-export function addVoucher(voucher: Omit<Voucher, "id" | "createdAt" | "updatedAt">): Voucher {
-  const newVoucher: Voucher = {
-    ...voucher,
-    id: `vch_${Date.now()}`,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-  saveVouchers([...getVouchers(), newVoucher]);
-  const seq = Number(localStorage.getItem(VOUCHER_SEQ_KEY) ?? "0");
-  localStorage.setItem(VOUCHER_SEQ_KEY, String(Math.max(seq, newVoucher.voucherNumber)));
-  return newVoucher;
-}
-
-export function updateVoucher(id: string, updates: Partial<Voucher>): void {
-  const vouchers = getVouchers();
-  const idx = vouchers.findIndex((v) => v.id === id);
-  if (idx === -1) return;
-  vouchers[idx] = { ...vouchers[idx], ...updates, updatedAt: new Date().toISOString() };
-  saveVouchers(vouchers);
-}
-
-export function deleteVoucher(id: string): void { saveVouchers(getVouchers().filter((v) => v.id !== id)); }
 
 // ─── Receipts ─────────────────────────────────────────────────────────────────
 

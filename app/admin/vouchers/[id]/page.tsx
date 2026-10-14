@@ -2,7 +2,8 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
-import { getVouchers, getSettings, getSales } from "@/lib/adminStore";
+import { getSettings, getSales } from "@/lib/adminStore";
+import { api } from "@/lib/api";
 import type { Voucher, AppSettings, Sale } from "@/types/admin";
 import { VOUCHER_STATUSES, VOUCHER_ROOM_TYPES } from "@/components/admin/VoucherForm";
 import { ArrowLeft, Printer, Edit3, Copy, Check, Phone, Mail, Globe } from "lucide-react";
@@ -19,11 +20,18 @@ export default function VoucherDetail({ params }: { params: Promise<{ id: string
   const [sale, setSale] = useState<Sale | null>(null);
   const [settings, setSettings] = useState<AppSettings | null>(null);
 
+  const [loaded, setLoaded] = useState(false);
+
   useEffect(() => {
-    const found = getVouchers().find((v) => v.id === id) ?? null;
-    setVoucher(found);
-    setSale(found?.saleId ? getSales().find((s) => s.id === found.saleId) ?? null : null);
     setSettings(getSettings());
+    api<{ voucher: Voucher }>(`/api/vouchers/${id}`)
+      .then(({ voucher: found }) => {
+        setVoucher(found);
+        // Bookings are still kept per browser, so the link only resolves where that booking exists.
+        setSale(found.saleId ? getSales().find((s) => s.id === found.saleId) ?? null : null);
+      })
+      .catch(() => setVoucher(null))
+      .finally(() => setLoaded(true));
   }, [id]);
 
   // Same portrait-A4 swap the invoice and receipt documents use — the shared
@@ -49,7 +57,7 @@ export default function VoucherDetail({ params }: { params: Promise<{ id: string
     };
   }, []);
 
-  if (!voucher) return <div className="p-6 text-gray-400">Voucher not found.</div>;
+  if (!voucher) return <div className="p-6 text-gray-400">{loaded ? "Voucher not found." : "Loading…"}</div>;
 
   const companyName = settings?.companyName ?? "Jacmiya Safaris";
   const companyEmail = settings?.companyEmail ?? "info@jacmiyasafaris.com";
@@ -125,7 +133,7 @@ export default function VoucherDetail({ params }: { params: Promise<{ id: string
 
             <div>
               <div className="font-semibold mb-2">Arrival</div>
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-[1fr_1fr_1.4fr_1.5fr] gap-x-8 gap-y-4">
                 <Line label="Date" value={formatDate(voucher.arrivalDate)} />
                 <Line label="Time" value={voucher.arrivalTime} />
                 <Line label="Method of Arrival" value={voucher.arrivalMethod} />
@@ -135,7 +143,7 @@ export default function VoucherDetail({ params }: { params: Promise<{ id: string
 
             <div>
               <div className="font-semibold mb-2">Departure</div>
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-[1fr_1fr_1.4fr_1.5fr] gap-x-8 gap-y-4">
                 <Line label="Date" value={formatDate(voucher.departureDate)} />
                 <Line label="Time" value={voucher.departureTime} />
                 <Line label="Method of Departure" value={voucher.departureMethod} />

@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { getVouchers, deleteVoucher, getSales } from "@/lib/adminStore";
+import { getSales } from "@/lib/adminStore";
+import { api, ApiError } from "@/lib/api";
 import type { Voucher, VoucherStatus, Sale } from "@/types/admin";
 import { VOUCHER_STATUSES } from "@/components/admin/VoucherForm";
 import { Plus, Trash2, Copy, Ticket, CalendarClock, Hotel } from "lucide-react";
@@ -17,14 +18,22 @@ function todayIso() { return new Date().toISOString().slice(0, 10); }
 
 export default function VouchersPage() {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState("");
   const [sales, setSales] = useState<Sale[]>([]);
   const [filter, setFilter] = useState<"All" | VoucherStatus>("All");
 
-  function load() {
-    setVouchers(getVouchers());
+  const load = useCallback(async () => {
     setSales(getSales());
-  }
-  useEffect(() => { load(); }, []);
+    try {
+      setVouchers((await api<{ vouchers: Voucher[] }>("/api/vouchers")).vouchers);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Could not load vouchers.");
+    } finally {
+      setLoaded(true);
+    }
+  }, []);
+  useEffect(() => { load(); }, [load]);
 
   const sorted = useMemo(() => [...vouchers].sort((a, b) => b.voucherNumber - a.voucherNumber), [vouchers]);
   const filtered = useMemo(
@@ -40,9 +49,13 @@ export default function VouchersPage() {
     return sales.find((s) => s.id === saleId)?.bookingRef ?? null;
   }
 
-  function handleDelete(v: Voucher) {
+  async function handleDelete(v: Voucher) {
     if (!confirm(`Delete voucher ${v.voucherNumber}? Its number will not be reused.`)) return;
-    deleteVoucher(v.id);
+    try {
+      await api(`/api/vouchers/${v.id}`, { method: "DELETE" });
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Could not delete the voucher.");
+    }
     load();
   }
 
@@ -93,7 +106,9 @@ export default function VouchersPage() {
         </div>
 
         <div className="divide-y divide-gray-50">
-          {filtered.length === 0 && (
+          {error && <div className="mx-5 my-4 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">{error}</div>}
+          {!loaded && <div className="py-16 text-center text-gray-400 text-sm">Loading…</div>}
+          {loaded && filtered.length === 0 && (
             <div className="py-16 text-center text-gray-400 text-sm">
               No vouchers yet. Create one for each lodge or hotel on a booking.
             </div>

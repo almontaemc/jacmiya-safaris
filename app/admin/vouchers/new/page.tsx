@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { getVouchers } from "@/lib/adminStore";
+import { api } from "@/lib/api";
 import type { Voucher } from "@/types/admin";
 import VoucherForm from "@/components/admin/VoucherForm";
 import { ArrowLeft } from "lucide-react";
@@ -16,8 +16,11 @@ function NewVoucher() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (copyId) setSource(getVouchers().find((v) => v.id === copyId));
-    setReady(true);
+    if (!copyId) { setReady(true); return; }
+    api<{ voucher: Voucher }>(`/api/vouchers/${copyId}`)
+      .then(({ voucher }) => setSource(voucher))
+      .catch(() => { /* copy source gone — start from a blank form */ })
+      .finally(() => setReady(true));
   }, [copyId]);
 
   if (!ready) return null;
