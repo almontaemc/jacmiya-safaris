@@ -30,22 +30,9 @@ const DEFAULT_RATE = 129;
 
 // ─── Initial data ─────────────────────────────────────────────────────────────
 
-const INITIAL_STAFF: StaffMember[] = [
-  { id: "s1", name: "Jacmiya Wambua", email: "jacmiya@jacmiyasafaris.com", phone: "+254 716 482 995", role: "Founder & CEO", department: "Management", status: "Active", hireDate: "2014-01-01", salary: 250000, bio: "Founder of Jacmiya Safaris with over 20 years of safari expertise across East Africa." },
-  { id: "s2", name: "James Mwangi", email: "james.mwangi@jacmiyasafaris.com", phone: "+254 712 345 678", role: "Head Safari Guide", department: "Guides", status: "Active", hireDate: "2018-03-15", salary: 85000, bio: "12 years guiding safaris across Kenya, Tanzania and Rwanda with deep wildlife knowledge." },
-  { id: "s3", name: "Grace Njeri", email: "grace.njeri@jacmiyasafaris.com", phone: "+254 723 456 789", role: "Sales Manager", department: "Sales", status: "Active", hireDate: "2019-07-01", salary: 95000, bio: "Leads the sales team with outstanding client relationship and conversion skills." },
-  { id: "s4", name: "David Kamau", email: "david.kamau@jacmiyasafaris.com", phone: "+254 734 567 890", role: "Senior Driver / Guide", department: "Drivers", status: "Active", hireDate: "2017-05-20", salary: 65000, bio: "Expert 4×4 safari driver with in-depth knowledge of Kenyan and Tanzanian routes." },
-  { id: "s5", name: "Sarah Wanjiku", email: "sarah.wanjiku@jacmiyasafaris.com", phone: "+254 745 678 901", role: "Operations Coordinator", department: "Operations", status: "Active", hireDate: "2020-02-10", salary: 75000, bio: "Manages end-to-end logistics ensuring every safari runs like clockwork." },
-  { id: "s6", name: "Peter Ochieng", email: "peter.ochieng@jacmiyasafaris.com", phone: "+254 756 789 012", role: "Safari Guide", department: "Guides", status: "On Leave", hireDate: "2021-08-01", salary: 70000, bio: "Wildlife photography safari specialist with extensive Tanzania experience." },
-  { id: "s7", name: "Mary Njoroge", email: "mary.njoroge@jacmiyasafaris.com", phone: "+254 767 890 123", role: "Admin Assistant", department: "Admin", status: "Active", hireDate: "2022-01-15", salary: 55000, bio: "Handles administrative operations and ensures smooth office management." },
-];
+const INITIAL_STAFF: StaffMember[] = [];
 
-const INITIAL_LEAVE: LeaveRequest[] = [
-  { id: "l1", staffId: "s6", staffName: "Peter Ochieng", type: "Annual", startDate: "2026-07-08", endDate: "2026-07-18", days: 10, reason: "Family vacation to Mombasa", status: "Approved", requestedAt: "2026-07-01T08:00:00.000Z", reviewedAt: "2026-07-02T10:00:00.000Z", reviewNote: "Approved. Enjoy your break!" },
-  { id: "l2", staffId: "s4", staffName: "David Kamau", type: "Sick", startDate: "2026-07-09", endDate: "2026-07-10", days: 2, reason: "Medical appointment and recovery", status: "Pending", requestedAt: "2026-07-08T07:30:00.000Z" },
-  { id: "l3", staffId: "s7", staffName: "Mary Njoroge", type: "Personal", startDate: "2026-07-15", endDate: "2026-07-15", days: 1, reason: "Attending a family event", status: "Pending", requestedAt: "2026-07-07T14:00:00.000Z" },
-  { id: "l4", staffId: "s2", staffName: "James Mwangi", type: "Annual", startDate: "2026-08-01", endDate: "2026-08-07", days: 7, reason: "Annual leave — visiting family in Kisumu", status: "Approved", requestedAt: "2026-07-05T09:00:00.000Z", reviewedAt: "2026-07-06T11:00:00.000Z", reviewNote: "Approved. Coverage arranged." },
-];
+const INITIAL_LEAVE: LeaveRequest[] = [];
 
 const INITIAL_LEADS: Lead[] = [
   { id: "lead_1", name: "Emily Richardson", email: "emily.r@gmail.com", phone: "+44 7911 123456", destination: "Kenya + Tanzania", travelDates: "August 2026", travelers: "Couple (2)", budget: "$2,000 – $4,000", message: "Looking for a romantic safari for our 10th anniversary. Love wildlife photography.", tourInterest: "Custom Safari", source: "Website", status: "Quoted", followUps: [{ id: "fu1", date: "2026-07-05T09:00:00.000Z", note: "Called Emily. Sent proposal for 7-day Mara & Serengeti package at $3,200pp." }], nextFollowUp: "2026-07-14", createdAt: "2026-07-03T08:30:00.000Z", updatedAt: "2026-07-05T09:00:00.000Z" },
@@ -88,30 +75,20 @@ const DEFAULT_SETTINGS: AppSettings = {
   bankDetails: "",
 };
 
-const INITIAL_PAYROLL: PayrollRun[] = [
-  {
-    id: "pay_1",
-    month: "2026-06",
-    label: "June 2026",
-    entries: [
-      { staffId: "s1", staffName: "Jacmiya Wambua",  role: "Founder & CEO",            department: "Management", baseSalary: 250000, bonus: 0,     deduction: 0, netPay: 250000, notes: "" },
-      { staffId: "s2", staffName: "James Mwangi",    role: "Head Safari Guide",         department: "Guides",     baseSalary: 85000,  bonus: 5000,  deduction: 0, netPay: 90000,  notes: "Performance bonus" },
-      { staffId: "s3", staffName: "Grace Njeri",     role: "Sales Manager",             department: "Sales",      baseSalary: 95000,  bonus: 15000, deduction: 0, netPay: 110000, notes: "Sales target bonus" },
-      { staffId: "s4", staffName: "David Kamau",     role: "Senior Driver / Guide",     department: "Drivers",    baseSalary: 65000,  bonus: 0,     deduction: 0, netPay: 65000,  notes: "" },
-      { staffId: "s5", staffName: "Sarah Wanjiku",   role: "Operations Coordinator",    department: "Operations", baseSalary: 75000,  bonus: 0,     deduction: 0, netPay: 75000,  notes: "" },
-      { staffId: "s6", staffName: "Peter Ochieng",   role: "Safari Guide",              department: "Guides",     baseSalary: 70000,  bonus: 0,     deduction: 0, netPay: 70000,  notes: "" },
-      { staffId: "s7", staffName: "Mary Njoroge",    role: "Admin Assistant",           department: "Admin",      baseSalary: 55000,  bonus: 0,     deduction: 0, netPay: 55000,  notes: "" },
-    ],
-    totalBasicKsh: 695000,
-    totalBonusKsh: 20000,
-    totalDeductionKsh: 0,
-    totalNetKsh: 715000,
-    totalNetUsd: 5543,
-    rate: 129,
-    processedAt: "2026-07-01T09:00:00.000Z",
-    notes: "June 2026 payroll — processed on time.",
-  },
-];
+const INITIAL_PAYROLL: PayrollRun[] = [];
+
+// Demo records that earlier versions seeded into every browser. Matched on the
+// exact demo id *and* name — real records get timestamp ids like "s1729…" — and
+// removed the next time each list is read.
+const DEMO_STAFF = new Set(["s1:Jacmiya Wambua", "s2:James Mwangi", "s3:Grace Njeri", "s4:David Kamau", "s5:Sarah Wanjiku", "s6:Peter Ochieng", "s7:Mary Njoroge"]);
+const DEMO_LEAVE = new Set(["l1:Peter Ochieng", "l2:David Kamau", "l3:Mary Njoroge", "l4:James Mwangi"]);
+const DEMO_PAYROLL = new Set(["pay_1:2026-07-01T09:00:00.000Z"]);
+
+function withoutDemo<T>(key: string, rows: T[], isDemo: (row: T) => boolean): T[] {
+  const kept = rows.filter((r) => !isDemo(r));
+  if (kept.length !== rows.length) localStorage.setItem(key, JSON.stringify(kept));
+  return kept;
+}
 
 // Accounts, sign-in and vouchers live in the shared database now — see
 // lib/server and app/api. Their old storage keys stay in ALL_KEYS below so a
@@ -233,7 +210,7 @@ export function deleteTour(id: number): void { saveTours(getTours().filter((t) =
 export function getStaff(): StaffMember[] {
   if (typeof window === "undefined") return [];
   const raw = localStorage.getItem(STAFF_KEY);
-  if (raw) return JSON.parse(raw) as StaffMember[];
+  if (raw) return withoutDemo(STAFF_KEY, JSON.parse(raw) as StaffMember[], (m) => DEMO_STAFF.has(`${m.id}:${m.name}`));
   localStorage.setItem(STAFF_KEY, JSON.stringify(INITIAL_STAFF));
   return INITIAL_STAFF;
 }
@@ -259,7 +236,7 @@ export function deleteStaff(id: string): void { saveStaff(getStaff().filter((s) 
 export function getLeave(): LeaveRequest[] {
   if (typeof window === "undefined") return [];
   const raw = localStorage.getItem(LEAVE_KEY);
-  if (raw) return JSON.parse(raw) as LeaveRequest[];
+  if (raw) return withoutDemo(LEAVE_KEY, JSON.parse(raw) as LeaveRequest[], (l) => DEMO_LEAVE.has(`${l.id}:${l.staffName}`));
   localStorage.setItem(LEAVE_KEY, JSON.stringify(INITIAL_LEAVE));
   return INITIAL_LEAVE;
 }
@@ -532,7 +509,7 @@ export function deleteExpense(id: string): void { saveExpenses(getExpenses().fil
 export function getPayroll(): PayrollRun[] {
   if (typeof window === "undefined") return [];
   const raw = localStorage.getItem(PAYROLL_KEY);
-  if (raw) return JSON.parse(raw) as PayrollRun[];
+  if (raw) return withoutDemo(PAYROLL_KEY, JSON.parse(raw) as PayrollRun[], (r) => DEMO_PAYROLL.has(`${r.id}:${r.processedAt}`));
   localStorage.setItem(PAYROLL_KEY, JSON.stringify(INITIAL_PAYROLL));
   return INITIAL_PAYROLL;
 }
