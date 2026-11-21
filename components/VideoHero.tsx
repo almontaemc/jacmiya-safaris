@@ -1,49 +1,51 @@
 import Link from "next/link";
+import HeroVideo from "./HeroVideo";
+
+const trust = ["Expert Local Guides", "Price Match Guarantee", "70+ Destinations", "24/7 Support"];
 
 export default function VideoHero() {
   return (
-    <section className="relative min-h-[92vh] flex items-end pb-20 bg-bark overflow-hidden">
+    // Fills the rest of the first screen below the 80px (h-20) navbar.
+    <section className="relative h-[calc(100svh-5rem)] min-h-[560px] flex flex-col bg-bark overflow-hidden">
 
-      {/* Fullscreen background video */}
-      <video
-        src="/hero-video.mp4"
-        className="absolute inset-0 w-full h-full object-cover"
-        autoPlay
-        muted
-        loop
-        playsInline
-      />
+      {/* Fullscreen background video: 4K on large screens with fast connections, 1080p otherwise */}
+      <HeroVideo poster="/hero-poster.jpg" />
 
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-bark/90 via-bark/40 to-bark/10" />
+      {/* Overlays: soften the bright sky and darken the left side for the text */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/15 to-black/50" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/25 to-transparent" />
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="inline-flex items-center gap-2 bg-savanna/20 backdrop-blur-sm border border-savanna/40 rounded-full px-4 py-1.5 text-savanna text-sm mb-6">
-          <span className="w-2 h-2 bg-savanna rounded-full animate-pulse" />
-          Est. in Kenya — Experts in East Africa
-        </div>
-        <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-cream leading-tight mb-6">
-          Discover Africa&apos;s<br />
-          <span className="text-savanna">Wild Heart</span>
-        </h1>
-        <p className="text-cream/70 text-lg sm:text-xl max-w-2xl mb-10 leading-relaxed">
-          Expert-guided safaris across Kenya, Tanzania, and Rwanda. 70+ breathtaking destinations, price-match guarantee, and memories that last a lifetime.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Link
-            href="/tours"
-            className="bg-savanna hover:bg-savanna-dark text-white font-semibold px-8 py-3.5 rounded-full text-lg transition-colors shadow-lg shadow-savanna/20 text-center"
-          >
-            Explore Tours
-          </Link>
+      <div className="relative z-10 flex-1 flex items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <p className="text-savanna text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] mb-5">
+            Jacmiya Safaris &amp; Holiday Tours
+          </p>
+          <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-normal text-white leading-[1.05] mb-6 max-w-4xl">
+            Discover Africa&apos;s Wild Heart
+          </h1>
+          <p className="text-white/85 text-lg sm:text-2xl max-w-2xl mb-10 leading-relaxed">
+            Expert-guided safaris across Kenya, Tanzania and Rwanda.
+          </p>
           <Link
             href="/contact"
-            className="border border-cream/40 hover:border-cream/80 text-cream font-semibold px-8 py-3.5 rounded-full text-lg transition-colors backdrop-blur-sm text-center"
+            className="inline-block bg-savanna hover:bg-savanna-dark text-white font-semibold uppercase tracking-wider text-sm sm:text-base px-8 py-4 transition-colors shadow-lg shadow-black/20"
           >
-            Plan Your Safari
+            Let&apos;s plan your custom safari
           </Link>
         </div>
+      </div>
+
+      {/* Bottom trust strip */}
+      <div className="relative z-10 border-t border-white/15 bg-black/25 backdrop-blur-sm">
+        <ul className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 grid grid-cols-2 md:grid-cols-4 gap-y-2 gap-x-4 text-white/85 text-xs sm:text-sm tracking-wide">
+          {trust.map((t) => (
+            <li key={t} className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-savanna flex-shrink-0" />
+              {t}
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
