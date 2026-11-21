@@ -2,6 +2,7 @@
 import FeaturedTours from "@/components/FeaturedTours";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import VideoHero from "@/components/VideoHero";
+import LodgePartners from "@/components/LodgePartners";
 
 const stats = [
   { value: "70+", label: "Destinations" },
@@ -85,6 +86,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <LodgePartners className="bg-cream" />
 
       <TestimonialsSection />
 

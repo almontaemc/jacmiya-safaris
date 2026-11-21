@@ -1,4 +1,5 @@
 ﻿import Link from "next/link";
+import LodgePartners from "@/components/LodgePartners";
 import type { Metadata } from "next";
 import { Handshake, Leaf, Star, Heart, MapPin, Users, Award, Globe } from "lucide-react";
 
@@ -166,6 +167,8 @@ export default function About() {
           </div>
         </div>
       </section>
+
+      <LodgePartners className="bg-cream" />
 
       <section className="py-20 px-4 bg-forest text-center">
         <div className="max-w-2xl mx-auto">
