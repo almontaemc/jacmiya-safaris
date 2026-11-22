@@ -1,14 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
 
-// TODO(client): confirm these are lodges Jacmiya actually works with before publishing.
-// Starting list copied from the Sidai Trails site; edit names, links and logos here.
+// Lodges Jacmiya has issued booking vouchers to (admin vouchers, Oct–Nov 2026) that have an
+// official website and logo. Edit names, links and logos here; logo files live in /public/images/partners.
 export const LODGE_PARTNERS = [
-  { name: "Sopa Lodges", url: "https://www.sopalodges.com", logo: "/images/partners/sopa-lodges.png" },
-  { name: "Soroi Collection", url: "https://soroi.com", logo: "/images/partners/soroi-collection.webp" },
-  { name: "Sentrim Hotels & Lodges", url: "https://www.sentrim-hotels.com", logo: "/images/partners/sentrim-hotels-lodges.svg" },
-  { name: "Enashipai Resort & Spa", url: "https://www.enashipai.com", logo: "/images/partners/enashipai-resort-spa.jpg" },
-  { name: "The Wilder Group", url: "https://www.wilder-group.com", logo: "/images/partners/wilder-group.svg" },
-  { name: "Elewana Collection", url: "https://www.elewanacollection.com", logo: "/images/partners/elewana-collection.png" },
+  { name: "Enkorok Mara Camp", url: "https://enkorokmaracamp.com", logo: "/images/partners/enkorok-mara-camp.svg" },
+  { name: "Saruni Basecamp", url: "https://sarunibasecamp.com", logo: "/images/partners/saruni-basecamp.png" },
+  { name: "Zebra Plains Collection", url: "https://zebraplainscollection.com", logo: "/images/partners/zebra-plains-collection.png" },
+  { name: "Lake Nakuru Lodge", url: "https://lakenakurulodge.com", logo: "/images/partners/lake-nakuru-lodge.png" },
+  { name: "Ziwa Bush Lodge", url: "https://www.ziwalodge.com", logo: "/images/partners/ziwa-bush-lodge.jpg" },
+  { name: "Serena Hotels", url: "https://www.serenahotels.com", logo: "/images/partners/serena-hotels.svg" },
 ];
 
 /** "Preferred lodge partners" logo grid (two rows of three on large screens), each logo on a white tile. */
