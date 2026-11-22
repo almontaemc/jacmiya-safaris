@@ -1,41 +1,65 @@
 /* eslint-disable @next/next/no-img-element */
+import Link from "next/link";
 
-// Lodges Jacmiya has issued booking vouchers to (admin vouchers, Oct–Nov 2026) that have an
-// official website and logo. Edit names, links and logos here; logo files live in /public/images/partners.
+// Client-approved list (Nov 2026). Logos are display-only (no outbound links, per client). Files live in /public/images/partners.
 export const LODGE_PARTNERS = [
-  { name: "Enkorok Mara Camp", url: "https://enkorokmaracamp.com", logo: "/images/partners/enkorok-mara-camp.svg" },
-  { name: "Saruni Basecamp", url: "https://sarunibasecamp.com", logo: "/images/partners/saruni-basecamp.png" },
-  { name: "Zebra Plains Collection", url: "https://zebraplainscollection.com", logo: "/images/partners/zebra-plains-collection.png" },
-  { name: "Lake Nakuru Lodge", url: "https://lakenakurulodge.com", logo: "/images/partners/lake-nakuru-lodge.png" },
-  { name: "Ziwa Bush Lodge", url: "https://www.ziwalodge.com", logo: "/images/partners/ziwa-bush-lodge.jpg" },
-  { name: "Serena Hotels", url: "https://www.serenahotels.com", logo: "/images/partners/serena-hotels.svg" },
+  { name: "Serena Hotels", logo: "/images/partners/serena-hotels.svg" },
+  { name: "Sarova Hotels & Resorts", logo: "/images/partners/sarova-hotels.svg" },
+  { name: "Elewana Collection", logo: "/images/partners/elewana-collection.png" },
+  { name: "Saruni Basecamp", logo: "/images/partners/saruni-basecamp.png" },
+  { name: "Kicheche Safari Camps", logo: "/images/partners/kicheche-safari-camps.png" },
+  { name: "Sopa Lodges", logo: "/images/partners/sopa-lodges.png" },
+  { name: "Soroi Collection", logo: "/images/partners/soroi-collection.webp" },
+  { name: "The Wilder Group", logo: "/images/partners/wilder-group.svg" },
+  { name: "Enashipai Resort & Spa", logo: "/images/partners/enashipai-resort-spa.jpg" },
 ];
 
-/** "Preferred lodge partners" logo grid (two rows of three on large screens), each logo on a white tile. */
+/**
+ * Lodge partners: copy on the left, one white "ledger" panel on the right with the logos
+ * in a 3×3 grid split by hairlines (no separate cards, no captions).
+ */
 export default function LodgePartners({ className = "" }: { className?: string }) {
   return (
-    <section className={`py-24 px-4 ${className}`} aria-label="Our preferred lodge partners">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
+    <section className={`py-24 px-4 ${className}`} aria-labelledby="lodge-partners-title">
+      <div className="max-w-7xl mx-auto grid gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center">
+        <div>
           <span className="text-savanna text-sm font-semibold uppercase tracking-widest">Where You&apos;ll Stay</span>
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-bark mt-2 mb-3">Our Preferred Lodge Partners</h2>
-          <p className="text-earth max-w-xl mx-auto">
-            Trusted lodges and camps we work with across East Africa, chosen for their comfort, warm service and care for the places they call home.
+          <h2 id="lodge-partners-title" className="font-serif text-3xl sm:text-4xl font-bold text-bark mt-2 mb-5">
+            Lodges &amp; camps we trust
+          </h2>
+          <div className="h-1 w-16 bg-savanna mb-6" aria-hidden="true" />
+          <p className="text-earth leading-relaxed max-w-md">
+            From classic Serena and Sarova lodges to intimate conservancy camps, we book the properties we know first-hand,
+            matched to your budget, your pace and the wildlife you most want to see.
           </p>
+          <p className="mt-6 font-serif text-5xl font-bold text-forest">
+            {LODGE_PARTNERS.length}
+            <span className="ml-3 align-middle font-sans text-sm font-semibold uppercase tracking-widest text-earth">
+              partner collections
+            </span>
+          </p>
+          <Link
+            href="/contact"
+            className="mt-8 inline-flex items-center gap-2 border-b-2 border-savanna pb-1 font-semibold text-bark transition hover:text-savanna"
+          >
+            Ask us about a lodge <span aria-hidden="true">→</span>
+          </Link>
         </div>
-        <ul className="mx-auto grid max-w-4xl grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3">
-          {LODGE_PARTNERS.map((p) => (
-            <li key={p.name}>
-              <a
-                href={p.url}
-                target="_blank"
-                rel="noopener"
-                className="flex h-36 sm:h-40 items-center justify-center rounded-xl border border-sand bg-white p-5 transition hover:-translate-y-0.5 hover:border-savanna/50 hover:shadow-md"
-              >
-                <img src={p.logo} alt={`${p.name} logo`} loading="lazy" className="max-h-20 max-w-full w-auto h-auto object-contain" />
-                <span className="sr-only">{p.name} (opens in a new tab)</span>
-              </a>
-              <p className="mt-2 text-center text-sm text-earth">{p.name}</p>
+
+        <ul className="grid grid-cols-3 overflow-hidden rounded-sm bg-white shadow-[0_20px_50px_-25px_rgba(26,16,8,0.35)] ring-1 ring-sand">
+          {LODGE_PARTNERS.map((p, i) => (
+            <li
+              key={p.name}
+              className={`${i % 3 !== 2 ? "border-r" : ""} ${i < 6 ? "border-b" : ""} border-sand/70`}
+            >
+              <div title={p.name} className="flex h-24 sm:h-32 lg:h-36 items-center justify-center p-3 sm:p-6">
+                <img
+                  src={p.logo}
+                  alt={p.name}
+                  loading="lazy"
+                  className="max-h-12 sm:max-h-16 lg:max-h-20 max-w-full w-auto h-auto object-contain"
+                />
+              </div>
             </li>
           ))}
         </ul>
